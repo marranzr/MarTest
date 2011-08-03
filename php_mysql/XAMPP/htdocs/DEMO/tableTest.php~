@@ -1,0 +1,38 @@
+<?php
+	
+
+$numRows = 5;
+
+echo "<table border='1'>";
+	
+	echo "<tr>";
+	
+		echo "<td>Salut</td>";
+		echo "<td>FirstName</td>";
+		echo "<td>LastName</td>";
+		echo "<td>Company</td>";
+
+	echo "</tr>";
+
+	
+	$ii = 0;
+	while($ii < $numRows) {
+		echo "<tr>";
+		
+		echo "<td>Mr</td>";
+		echo "<td>Joe</td>";
+		echo "<td>Bloggs</td>";
+		echo "<td>3</td>";
+	
+		echo "</tr>";
+		$ii++;
+	}
+
+
+
+
+echo "</table>";	
+
+
+
+?>	

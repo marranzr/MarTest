@@ -1,0 +1,4736 @@
+<?xml version="1.0"?>
+<snippets>
+  <branch title="phpTraining-0104">
+    
+    
+  <branch title="New File"><leaf type="insert" title="dbConfig.php"><before>&lt;?php
+	
+$db = array(
+'hostname' =&gt; 'localhost',
+'username' =&gt; 'root',
+'password' =&gt; '',
+'database' =&gt; 'alphacrm',
+); 
+
+?&gt;</before><after/></leaf><leaf type="insert" title="php simple tags" tooltip="&lt;?php ... ?&gt;&#10;"><before>&lt;?php
+	
+</before><after>
+
+?&gt;</after></leaf></branch><branch title="Project alphaCRM"><branch title="Initialise"><leaf type="insert" title="initialise_tCompany"><before>&lt;?php
+/*
+
+*	File:			tCompanyInitialise.php
+*	By:			TMIT
+*	Date:		
+*
+*	This script initialises the tCompany TABLE
+*
+*
+*=====================================
+*/
+
+{ 		//	Secure Connection Script
+		include('../../htconfig/dbConfig.php'); 
+		$dbSuccess = false;
+		$dbConnected = mysql_connect($db['hostname'],$db['username'],$db['password']);
+		
+		if ($dbConnected) {		
+			$dbSelected = mysql_select_db($db['database'],$dbConnected);
+			if ($dbSelected) {
+				$dbSuccess = true;
+			} 	
+		}
+		//	END	Secure Connection Script
+}
+
+if ($dbSuccess) {
+
+	
+	{	//		Table Definition 
+		$tableName = "tCompany";	
+		$CSVfilename = "csvCompany";
+
+		$tableField = array(
+					'preName',
+					'Name',
+					'RegType',
+					'StreetA',			
+					'StreetB',			
+					'StreetC',			
+					'Town',			
+					'County',			
+					'Postcode',			
+					'COUNTRY'				
+		);
+		$numFields = sizeof($tableField);
+		
+		echo '$numFields : '.$numFields.'&lt;br /&gt;';
+
+		$createTable_SQL = "
+					CREATE TABLE alphacrm.".$tableName." (
+					ID INT( 11 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+					preName VARCHAR( 50 ) ,
+					Name VARCHAR( 250 ) NOT NULL,
+					RegType VARCHAR( 50 )  NULL,
+					
+					StreetA VARCHAR( 150 )  NULL,
+					StreetB VARCHAR( 150 )  NULL,
+					StreetC VARCHAR( 150 )  NULL,
+					Town VARCHAR( 150 )  NULL,
+					County VARCHAR( 150 )  NULL,
+					Postcode VARCHAR( 50 )  NULL,
+					
+					COUNTRY VARCHAR( 250 ) NOT NULL
+		)";
+	}
+	
+	//	=======^^^^^^^^^^^^^^^^^^^^^^^=========  End of Definition Part ======^^^^^^^^^=====
+
+										
+		{  //		read CSV data file
+	
+			$file = fopen($CSVfilename, "r"); 		
+			$i = 0;
+			while(!feof($file))
+			  {		  	
+				$thisLine = fgets($file);		
+				$tableData[$i] = explode(",", $thisLine);
+				$i++; 
+			  }
+			fclose($file);
+			
+			$numRows = sizeof($tableData);
+		}
+		echo '$numRows : '.$numRows.'&lt;br /&gt;';
+		echo '$tableField[$numFields-1] : '.$tableField[$numFields-1].'&lt;br /&gt;';
+
+		{	//		DROP table		
+	
+		
+			$drop_SQL = "DROP TABLE ".$tableName;
+			
+			if (mysql_query($drop_SQL))  {	
+				echo "'DROP ".$tableName."' -  Successful.";
+			} else {
+				echo "'DROP ".$tableName."' - Failed.";
+			}
+		}
+		
+		echo "&lt;br /&gt;&lt;hr /&gt;&lt;br /&gt;";
+	
+		{	//		CREATE table		
+			
+			if (mysql_query($createTable_SQL))  {	
+				echo "'CREATE ".$tableName."' -  Successful.";
+			} else {
+				echo "'CREATE ".$tableName."' - Failed.";
+			}
+		}		
+		echo "&lt;br /&gt;&lt;hr /&gt;&lt;br /&gt;";
+			
+			$table_SQLinsert = "INSERT INTO ".$tableName." (";
+			
+			//$table_SQLinsert .=   "x"; 
+			foreach($tableField as $tableFieldName) {
+				$table_SQLinsert .=  $tableFieldName;
+				if($tableFieldName &lt;&gt; $tableField[$numFields-1]) {
+					$table_SQLinsert .=  ", ";
+				}
+			}
+			$table_SQLinsert .=  ") VALUES ";
+
+			$indx = 0;		
+			while($indx &lt; $numRows) {			
+				$table_SQLinsert .=  "(";
+				
+				foreach($tableField as $key =&gt; $tableFieldName) {
+					
+					$table_SQLinsert .=  "'".$tableData[$indx][$key]."'";
+					if($tableFieldName &lt;&gt; $tableField[$numFields-1]) {
+						$table_SQLinsert .=  ", ";
+					}
+
+				}
+
+				$table_SQLinsert .=  ") ";
+				if ($indx &lt; ($numRows - 1)) {
+					$table_SQLinsert .=  ",\n";
+				}
+				
+				$indx++;
+			}
+		
+			{	//	Echo and Execute the SQL and test for success   
+			
+						echo "&lt;strong&gt;&lt;u&gt;SQL:&lt;br /&gt;&lt;/u&gt;&lt;/strong&gt;";
+						echo $table_SQLinsert."&lt;br /&gt;&lt;br /&gt;";
+							
+						if (mysql_query($table_SQLinsert))  {				
+							echo "was SUCCESSFUL.&lt;br /&gt;&lt;br /&gt;";
+						} else {
+							echo "FAILED.&lt;br /&gt;&lt;br /&gt;";		
+						}
+			}
+}
+
+?&gt;</before><after/></leaf><leaf type="insert" title="initialise_tPerson"><before>&lt;?php
+/*
+
+*	File:			tPersonInitialise.php
+*	By:			TMIT
+*	Date:		
+*
+*	This script initialises the tPerson TABLE
+*
+*
+*=====================================
+*/
+
+{ 		//	Secure Connection Script
+		include('../../htconfig/dbConfig.php'); 
+		$dbSuccess = false;
+		$dbConnected = mysql_connect($db['hostname'],$db['username'],$db['password']);
+		
+		if ($dbConnected) {		
+			$dbSelected = mysql_select_db($db['database'],$dbConnected);
+			if ($dbSelected) {
+				$dbSuccess = true;
+			} 	
+		}
+		//	END	Secure Connection Script
+}
+
+if ($dbSuccess) {
+	
+		$tableName = "tPerson";	
+		$CSVfilename = "csvPerson";
+		
+		$tableField = array(
+					'Salutation',
+					'FirstName',
+					'LastName',
+					'CompanyID'
+		);
+		$numFields = sizeof($tableField);
+			
+		$createTable_SQL =  "CREATE TABLE alphacrm.".$tableName." (
+									ID INT( 11 ) NOT NULL AUTO_INCREMENT PRIMARY KEY , 
+									Salutation VARCHAR( 20 ) , 
+									FirstName VARCHAR( 50 ) , 
+									LastName VARCHAR( 50 ) NOT NULL, 
+									CompanyID INT ( 11 ) NOT NULL 
+		)";
+
+
+	//	=======^^^^^^^^^^^^^^^^^^^^^^^=========  End of Definition Part ======^^^^^^^^^=====
+
+										
+		{  //		read CSV data file
+	
+			$file = fopen($CSVfilename, "r"); 		
+			$i = 0;
+			while(!feof($file))
+			  {		  	
+				$thisLine = fgets($file);		
+				$tableData[$i] = explode(",", $thisLine);
+				$i++; 
+			  }
+			fclose($file);
+			
+			$numRows = sizeof($tableData);
+		}
+		echo '$numRows : '.$numRows.'&lt;br /&gt;';
+		echo '$tableField[$numFields-1] : '.$tableField[$numFields-1].'&lt;br /&gt;';
+
+		{	//		DROP table		
+	
+		
+			$drop_SQL = "DROP TABLE ".$tableName;
+			
+			if (mysql_query($drop_SQL))  {	
+				echo "'DROP ".$tableName."' -  Successful.";
+			} else {
+				echo "'DROP ".$tableName."' - Failed.";
+			}
+		}
+		
+		echo "&lt;br /&gt;&lt;hr /&gt;&lt;br /&gt;";
+	
+		{	//		CREATE table		
+			
+			if (mysql_query($createTable_SQL))  {	
+				echo "'CREATE ".$tableName."' -  Successful.";
+			} else {
+				echo "'CREATE ".$tableName."' - Failed.";
+			}
+		}		
+		echo "&lt;br /&gt;&lt;hr /&gt;&lt;br /&gt;";
+			
+			$table_SQLinsert = "INSERT INTO ".$tableName." (";
+			
+			//$table_SQLinsert .=   "x"; 
+			foreach($tableField as $tableFieldName) {
+				$table_SQLinsert .=  $tableFieldName;
+				if($tableFieldName &lt;&gt; $tableField[$numFields-1]) {
+					$table_SQLinsert .=  ", ";
+				}
+			}
+			$table_SQLinsert .=  ") VALUES ";
+
+			$indx = 0;		
+			while($indx &lt; $numRows) {			
+				$table_SQLinsert .=  "(";
+				
+				foreach($tableField as $key =&gt; $tableFieldName) {
+					
+					$table_SQLinsert .=  "'".$tableData[$indx][$key]."'";
+					if($tableFieldName &lt;&gt; $tableField[$numFields-1]) {
+						$table_SQLinsert .=  ", ";
+					}
+
+				}
+
+				$table_SQLinsert .=  ") ";
+				if ($indx &lt; ($numRows - 1)) {
+					$table_SQLinsert .=  ",\n";
+				}
+				
+				$indx++;
+			}
+		
+			{	//	Echo and Execute the SQL and test for success   
+			
+						echo "&lt;strong&gt;&lt;u&gt;SQL:&lt;br /&gt;&lt;/u&gt;&lt;/strong&gt;";
+						echo $table_SQLinsert."&lt;br /&gt;&lt;br /&gt;";
+							
+						if (mysql_query($table_SQLinsert))  {				
+							echo "was SUCCESSFUL.&lt;br /&gt;&lt;br /&gt;";
+						} else {
+							echo "FAILED.&lt;br /&gt;&lt;br /&gt;";		
+						}
+			}
+}
+
+?&gt;</before><after/></leaf><leaf type="insert" title="datafile People"><before>Mr,Mike,Freighn,4
+Mrs,Kathie,Arnott,2
+Ms,Zeta,Flowers,1
+M,Guy,Donnet,3
+Mrs,Harriet,Hennesey,3
+Dr,George,Terry,2
+Sir,Geoffrey,Paul,1
+Mrs,Laura,Winalott,
+Mr,Peter,Bellows,1
+Prof,Russell,Tandie,2
+Mr,Riley,Goffs,1
+Mrs,Sue,Gentle,
+Ms,Taylor,McFly,1
+Sir,William,Brite,5
+Mr,Peter,Flynn,5</before><after/></leaf><leaf type="insert" title="datafileCompanies"><before>The,Pie Company,,Fen Street,,,Norwich,Norfolk,,UK&#xD;
+,TMIT,Ltd,42 Lily Close,,,Bicester,Oxon,OX26 3EJ,UK&#xD;
+La,Monde Reale,,Rue De LAu,,,Paris,,,France&#xD;
+,Burger Jack,Inc,King Lane,,,NY,NY,NY777,USA
+The,Really Great Car,Co,Pickle Ave.,,,Douglas,IOM,IM99,UK
+,Fish,PLC,Cod Row,,,Billingsgate,London,E14,England
+,Extravaganza,,Superheros Road,,,,Neverland,,Fairy Kingdom
+,Baggins Bags,,Bag End,,,Hobiton,Gwynedd,,Middle Earth</before><after/></leaf><leaf type="insert" title="New Table Field"><before>&lt;?php
+/*
+
+*	File:			newTableField.php
+*	By:			TMIT
+*	Date:		2010-06-01
+*
+*	This script adds a new VARCHAR field to the table $thisTable
+*
+*
+*=====================================
+*/
+
+{ 		//	Secure Connection Script
+		include('../../htconfig/dbConfig.php'); 
+		$dbSuccess = false;
+		$dbConnected = mysql_connect($db['hostname'],$db['username'],$db['password']);
+		
+		if ($dbConnected) {		
+			$dbSelected = mysql_select_db($db['database'],$dbConnected);
+			if ($dbSelected) {
+				$dbSuccess = true;
+			} 	
+		}
+		//	END	Secure Connection Script
+}
+
+if ($dbSuccess) {
+	
+		$thisTable = "tPerson";
+		$newField = "Tel";
+		$newFieldLength = 50;
+		
+		$newField_SQLalter =  "ALTER TABLE ".$thisTable;
+		$newField_SQLalter .= " ADD ".$newField;
+		$newField_SQLalter .= " VARCHAR(".$newFieldLength.") NOT NULL";
+		 
+		echo '&lt;span style = "text-decoration: underline;"&gt;
+				SQL statement:&lt;/span&gt;
+				&lt;br /&gt;'.$newField_SQLalter.'&lt;br /&gt;&lt;br /&gt;';
+				
+		if (mysql_query($newField_SQLalter))  {	
+			echo 'used to Successfully add new field '.$newField.' to '.$thisTable.'.&lt;br /&gt;&lt;br /&gt;';
+		} else {
+			echo '&lt;span style="color:red; "&gt;FAILED to add field.&lt;/span&gt;&lt;br /&gt;&lt;br /&gt;';
+			
+		}	
+
+}
+
+?&gt;</before><after/></leaf><leaf type="insert" title="initialise_tLookup.php"><before>&lt;?php
+/*
+
+*	File:			initialise_tLookup.php
+*	By:			TMIT
+*	Date:		
+*
+*	This script initialises the tLookup TABLE
+*		by populating it with a list of Salutations
+*		for use in the table tPerson
+*
+*
+*=====================================
+*/
+
+{ 		//	Secure Connection Script
+		include('../../htconfig/dbConfig.php'); 
+		$dbSuccess = false;
+		$dbConnected = mysql_connect($db['hostname'],$db['username'],$db['password']);
+		
+		if ($dbConnected) {		
+			$dbSelected = mysql_select_db($db['database'],$dbConnected);
+			if ($dbSelected) {
+				$dbSuccess = true;
+			} 	
+		}
+		//	END	Secure Connection Script
+}
+
+if ($dbSuccess) {
+
+	
+	{	//		Table Definition 
+		$tableName = "tLookup";	
+		$CSVfilename = "csvLookupSalutation";
+
+		//		ONLY the fields to insert - NOT any auto_inc field	
+		$tableField = array(
+					'lookupType',
+					'lookupValue' ,
+					'lookupOrder'
+		);
+		$numFields = sizeof($tableField);
+		
+		echo '$numFields : '.$numFields.'&lt;br /&gt;';
+
+		$createTable_SQL = "
+					CREATE TABLE alphacrm.".$tableName." (
+					ID INT( 11 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+					lookupType VARCHAR( 50 ) NOT NULL,
+					lookupValue VARCHAR( 250 ) NOT NULL, 
+					lookupOrder INT( 11 ) NOT NULL DEFAULT '0'
+		)";
+		
+		//		set startInsertsField to 1 if first field is auto_increment
+		//			otherwise set to 0.
+
+	}
+
+	//	=======^^^^^^^^^^^^^^^^^^^^^^^=========  End of Definition Part ======^^^^^^^^^=====
+
+										
+		{  //		read CSV data file
+	
+			$file = fopen($CSVfilename, "r"); 		
+			$i = 0;
+			while(!feof($file))
+			  {		  	
+				$thisLine = fgets($file);		
+				$tableData[$i] = explode(",", $thisLine);
+				$i++; 
+			  }
+			fclose($file);
+			
+			$numRows = sizeof($tableData);
+		}
+		echo '$numRows : '.$numRows.'&lt;br /&gt;';
+		echo '$tableField[$numFields-1] : '.$tableField[$numFields-1].'&lt;br /&gt;';
+
+		{	//		DROP table		
+	
+		
+			$drop_SQL = "DROP TABLE ".$tableName;
+			
+			if (mysql_query($drop_SQL))  {	
+				echo "'DROP ".$tableName."' -  Successful.";
+			} else {
+				echo "'DROP ".$tableName."' - Failed.";
+			}
+		}
+		
+		echo "&lt;br /&gt;&lt;hr /&gt;&lt;br /&gt;";
+	
+		{	//		CREATE table		
+			
+			if (mysql_query($createTable_SQL))  {	
+				echo "'CREATE ".$tableName."' -  Successful.";
+			} else {
+				echo "'CREATE ".$tableName."' - Failed.";
+			}
+		}		
+		echo "&lt;br /&gt;&lt;hr /&gt;&lt;br /&gt;";
+			
+			$table_SQLinsert = "INSERT INTO ".$tableName." (";
+			
+			//$table_SQLinsert .=   "x"; 
+			foreach($tableField as $tableFieldName) {
+				$table_SQLinsert .=  $tableFieldName;
+				if($tableFieldName &lt;&gt; $tableField[$numFields-1]) {
+					$table_SQLinsert .=  ", ";
+				}
+			}
+			$table_SQLinsert .=  ") VALUES ";
+
+			$indx = 0;		
+			while($indx &lt; $numRows) {			
+				$table_SQLinsert .=  "(";
+				
+				foreach($tableField as $key =&gt; $tableFieldName) {
+					
+					$table_SQLinsert .=  "'".$tableData[$indx][$key]."'";
+					if($tableFieldName &lt;&gt; $tableField[$numFields-1]) {
+						$table_SQLinsert .=  ", ";
+					}
+
+				}
+
+				$table_SQLinsert .=  ") ";
+				if ($indx &lt; ($numRows - 1)) {
+					$table_SQLinsert .=  ",\n";
+				}
+				
+				$indx++;
+			}
+		
+			{	//	Echo and Execute the SQL and test for success   
+			
+						echo "&lt;strong&gt;&lt;u&gt;SQL:&lt;br /&gt;&lt;/u&gt;&lt;/strong&gt;";
+						echo $table_SQLinsert."&lt;br /&gt;&lt;br /&gt;";
+							
+						if (mysql_query($table_SQLinsert))  {				
+							echo "was SUCCESSFUL.&lt;br /&gt;&lt;br /&gt;";
+						} else {
+							echo "FAILED.&lt;br /&gt;&lt;br /&gt;";		
+						}
+			}
+}
+
+?&gt;</before><after/></leaf><leaf type="insert" title="datafile Salutations"><before>Salutation,Mr,1
+Salutation,Mrs,2
+Salutation,Ms,3
+Salutation,Miss,4
+Salutation,Dr,5
+Salutation,Prof.,6
+Salutation,Sir,7
+Salutation,Lord,8
+Salutation,Lady,9
+Salutation,Hon.,10
+Salutation,Rt.Hon.,11
+Salutation,Rev.,12
+Salutation,Rt.Rev.,13
+Salutation,Baron,14
+Salutation,Baroness,15
+Salutation,Count,16
+Salutation,Countess,17
+Salutation,Capt.,18
+Salutation,Major,19
+Salutation,Col.,20
+Salutation,Gen.,21
+Salutation,M.,22</before><after/></leaf><leaf type="insert" title="datafile countries"><before>country,United Kingdom,1
+country,Eire,2
+country,Afghanistan,3
+country,Akrotiri,4
+country,Albania,5
+country,Algeria,6
+country,American Samoa,7
+country,Andorra,8
+country,Angola,9
+country,Anguilla,10
+country,Antarctica,11
+country,Antigua and Barbuda,12
+country,Argentina,13
+country,Armenia,14
+country,Aruba,15
+country,Ashmore and Cartier Islands,16
+country,Australia,17
+country,Austria,18
+country,Azerbaijan,19
+country,Bahamas,20
+country,Bahrain,21
+country,Bangladesh,22
+country,Barbados,23
+country,Bassas da India,24
+country,Belarus,25
+country,Belgium,26
+country,Belize,27
+country,Benin,28
+country,Bermuda,29
+country,Bhutan,30
+country,Bolivia,31
+country,Bosnia and Herzegovina,32
+country,Botswana,33
+country,Bouvet Island,34
+country,Brazil,35
+country,British Indian Ocean Territory,36
+country,British Virgin Islands,37
+country,Brunei,38
+country,Bulgaria,39
+country,Burkina Faso,40
+country,Burma,41
+country,Burundi,42
+country,Cambodia,43
+country,Cameroon,44
+country,Canada,45
+country,Cape Verde,46
+country,Cayman Islands,47
+country,Central African Republic,48
+country,Chad,49
+country,Chile,50
+country,China,51
+country,Christmas Island,52
+country,Clipperton Island,53
+country,Cocos (Keeling) Islands,54
+country,Colombia,55
+country,Comoros,56
+country,Congo - Democratic Republic,57
+country,Congo - Republic,58
+country,Cook Islands,59
+country,Coral Sea Islands,60
+country,Costa Rica,61
+country,Cote d Ivoire,62
+country,Croatia,63
+country,Cuba,64
+country,Cyprus,65
+country,Czech Republic,66
+country,Denmark,67
+country,Dhekelia,68
+country,Djibouti,69
+country,Dominica,70
+country,Dominican Republic,71
+country,Ecuador,72
+country,Egypt,73
+country,El Salvador,74
+country,Equatorial Guinea,75
+country,Eritrea,76
+country,Estonia,77
+country,Ethiopia,78
+country,Europa Island,79
+country,Falkland Islands (Islas Malvinas),80
+country,Faroe Islands,81
+country,Fiji,82
+country,Finland,83
+country,France,84
+country,French Guiana,85
+country,French Polynesia,86
+country,French Southern and Antarctic Lands,87
+country,Gabon,88
+country,Gambia,89
+country,Gaza Strip,90
+country,Georgia,91
+country,Germany,92
+country,Ghana,93
+country,Gibraltar,94
+country,Glorioso Islands,95
+country,Greece,96
+country,Greenland,97
+country,Grenada,98
+country,Guadeloupe,99
+country,Guam,100
+country,Guatemala,101
+country,Guernsey,102
+country,Guinea,103
+country,Guinea-Bissau,104
+country,Guyana,105
+country,Haiti,106
+country,Heard Island and McDonald Islands,107
+country,Holy See (Vatican City),108
+country,Honduras,109
+country,Hong Kong,110
+country,Hungary,111
+country,Iceland,112
+country,India,113
+country,Indonesia,114
+country,Iran,115
+country,Iraq,116
+country,Israel,117
+country,Italy,118
+country,Jamaica,119
+country,Jan Mayen,120
+country,Japan,121
+country,Jersey,122
+country,Jordan,123
+country,Juan de Nova Island,124
+country,Kazakhstan,125
+country,Kenya,126
+country,Kiribati,127
+country,Korea - North,128
+country,Korea - South,129
+country,Kuwait,130
+country,Kyrgyzstan,131
+country,Laos,132
+country,Latvia,133
+country,Lebanon,134
+country,Lesotho,135
+country,Liberia,136
+country,Libya,137
+country,Liechtenstein,138
+country,Lithuania,139
+country,Luxembourg,140
+country,Macau,141
+country,Macedonia,142
+country,Madagascar,143
+country,Malawi,144
+country,Malaysia,145
+country,Maldives,146
+country,Mali,147
+country,Malta,148
+country,Marshall Islands,149
+country,Martinique,150
+country,Mauritania,151
+country,Mauritius,152
+country,Mayotte,153
+country,Mexico,154
+country,Micronesia,155
+country,Moldova,156
+country,Monaco,157
+country,Mongolia,158
+country,Montserrat,159
+country,Morocco,160
+country,Mozambique,161
+country,Namibia,162
+country,Nauru,163
+country,Navassa Island,164
+country,Nepal,165
+country,Netherlands,166
+country,Netherlands Antilles,167
+country,New Caledonia,168
+country,New Zealand,169
+country,Nicaragua,170
+country,Niger,171
+country,Nigeria,172
+country,Niue,173
+country,Norfolk Island,174
+country,Northern Mariana Islands,175
+country,Norway,176
+country,Oman,177
+country,Pakistan,178
+country,Palau,179
+country,Panama,180
+country,Papua New Guinea,181
+country,Paracel Islands,182
+country,Paraguay,183
+country,Peru,184
+country,Philippines,185
+country,Pitcairn Islands,186
+country,Poland,187
+country,Portugal,188
+country,Puerto Rico,189
+country,Qatar,190
+country,Reunion,191
+country,Romania,192
+country,Russia,193
+country,Rwanda,194
+country,Saint Helena,195
+country,Saint Kitts and Nevis,196
+country,Saint Lucia,197
+country,Saint Pierre and Miquelon,198
+country,Saint Vincent and the Grenadines,199
+country,Samoa,200
+country,San Marino,201
+country,Sao Tome and Principe,202
+country,Saudi Arabia,203
+country,Senegal,204
+country,Serbia and Montenegro,205
+country,Seychelles,206
+country,Sierra Leone,207
+country,Singapore,208
+country,Slovakia,209
+country,Slovenia,210
+country,Solomon Islands,211
+country,Somalia,212
+country,South Africa,213
+country,South Georgia and South Sandwich Islands,214
+country,Spain,215
+country,Spratly Islands,216
+country,Sri Lanka,217
+country,Sudan,218
+country,Suriname,219
+country,Svalbard,220
+country,Swaziland,221
+country,Sweden,222
+country,Switzerland,223
+country,Syria,224
+country,Taiwan,225
+country,Tajikistan,226
+country,Tanzania,227
+country,Thailand,228
+country,Timor-Leste,229
+country,Togo,230
+country,Tokelau,231
+country,Tonga,232
+country,Trinidad and Tobago,233
+country,Tromelin Island,234
+country,Tunisia,235
+country,Turkey,236
+country,Turkmenistan,237
+country,Turks and Caicos Islands,238
+country,Tuvalu,239
+country,Uganda,240
+country,Ukraine,241
+country,United Arab Emirates,242
+country,United States,243
+country,Uruguay,244
+country,Uzbekistan,245
+country,Vanuatu,246
+country,Venezuela,247
+country,Vietnam,248
+country,Virgin Islands,249
+country,Wake Island,250
+country,Wallis and Futuna,251
+country,West Bank,252</before><after/></leaf><leaf type="insert" title="initialise_countries"><before>&lt;?php
+/*
+
+*	File:			initialise_countries.php
+*	By:			TMIT
+*	Date:		
+*
+*	This script INSERT the csv file csvCountries into the tLookup TABLE
+*
+*
+*=====================================
+*/
+
+{ 		//	Secure Connection Script
+		include('../../htconfig/dbConfig.php'); 
+		$dbSuccess = false;
+		$dbConnected = mysql_connect($db['hostname'],$db['username'],$db['password']);
+		
+		if ($dbConnected) {		
+			$dbSelected = mysql_select_db($db['database'],$dbConnected);
+			if ($dbSelected) {
+				$dbSuccess = true;
+			} 	
+		}
+		//	END	Secure Connection Script
+}
+
+if ($dbSuccess) {
+
+	
+	{	//		Table Definition 
+		$tableName = "tLookup";	
+		$CSVfilename = "csvCountries";
+
+		//		ONLY the fields to insert - NOT any auto_inc field	
+		$tableField = array(
+					'lookupType',
+					'lookupValue' ,
+					'lookupOrder'
+		);
+		$numFields = sizeof($tableField);
+		
+		echo '$numFields : '.$numFields.'&lt;br /&gt;';
+
+	}
+
+	//	=======^^^^^^^^^^^^^^^^^^^^^^^=========  End of Definition Part ======^^^^^^^^^=====
+
+										
+		{  //		read CSV data file
+	
+			$file = fopen($CSVfilename, "r"); 		
+			$i = 0;
+			while(!feof($file))
+			  {		  	
+				$thisLine = fgets($file);		
+				$tableData[$i] = explode(",", $thisLine);
+				$i++; 
+			  }
+			fclose($file);
+			
+			$numRows = sizeof($tableData);
+		}
+		echo '$numRows : '.$numRows.'&lt;br /&gt;';
+	//	echo '$tableField[$numFields-1] : '.$tableField[$numFields-1].'&lt;br /&gt;';
+
+				
+			$table_SQLinsert = "INSERT INTO ".$tableName." (";
+			
+			//$table_SQLinsert .=   "x"; 
+			foreach($tableField as $tableFieldName) {
+				$table_SQLinsert .=  $tableFieldName;
+				if($tableFieldName &lt;&gt; $tableField[$numFields-1]) {
+					$table_SQLinsert .=  ", ";
+				}
+			}
+			$table_SQLinsert .=  ") VALUES ";
+
+			$indx = 0;		
+			while($indx &lt; $numRows) {			
+				$table_SQLinsert .=  "(";
+				
+				foreach($tableField as $key =&gt; $tableFieldName) {
+					
+					$table_SQLinsert .=  "'".$tableData[$indx][$key]."'";
+					if($tableFieldName &lt;&gt; $tableField[$numFields-1]) {
+						$table_SQLinsert .=  ", ";
+					}
+
+				}
+
+				$table_SQLinsert .=  ") ";
+				if ($indx &lt; ($numRows - 1)) {
+					$table_SQLinsert .=  ",\n";
+				}
+				
+				$indx++;
+			}
+		
+			{	//	Echo and Execute the SQL and test for success   
+			
+						echo "&lt;strong&gt;&lt;u&gt;SQL:&lt;br /&gt;&lt;/u&gt;&lt;/strong&gt;";
+						echo $table_SQLinsert."&lt;br /&gt;&lt;br /&gt;";
+							
+						if (mysql_query($table_SQLinsert))  {				
+							echo "INSERT countries was SUCCESSFUL.&lt;br /&gt;&lt;br /&gt;";
+						} else {
+							echo "INSERT countries FAILED.&lt;br /&gt;&lt;br /&gt;";		
+						}
+			}
+}
+
+?&gt;</before><after/></leaf><leaf type="insert" title="initialise_tAccessControl"><before>&lt;?php
+/*
+
+*	File:			initialise_tAccessControl.php
+*	By:			TMIT
+*	Date:		
+*
+*	This script initialises the tAccessControl TABLE
+*		by populating it with a list of ACL
+*
+*
+*=====================================
+*/
+
+{ 		//	Secure Connection Script
+		include('../../htconfig/dbConfig.php'); 
+		$dbSuccess = false;
+		$dbConnected = mysql_connect($db['hostname'],$db['username'],$db['password']);
+		
+		if ($dbConnected) {		
+			$dbSelected = mysql_select_db($db['database'],$dbConnected);
+			if ($dbSelected) {
+				$dbSuccess = true;
+			} 	
+		}
+		//	END	Secure Connection Script
+}
+
+if ($dbSuccess) {
+
+	
+	{	//		Table Definition 
+		$tableName = "tAccessControl";	
+
+		//		ONLY the fields to insert - NOT any auto_inc field	
+		$tableField = array(
+					'accessLevel',
+					'userType' 
+		);
+		$numFields = sizeof($tableField);
+		
+		echo '$numFields : '.$numFields.'&lt;br /&gt;';
+
+
+
+
+		$createTable_SQL = 'CREATE TABLE alphacrm.'.$tableName.' (
+									ID INT( 11 ) NOT NULL  AUTO_INCREMENT,
+									accessLevel INT( 11 ) NOT NULL ,
+									userType VARCHAR( 50 ) NOT NULL ,
+									PRIMARY KEY ( ID ) ,
+									UNIQUE (
+									accessLevel ,
+									userType)
+									)';	
+										
+		echo $createTable_SQL."&lt;br /&gt;&lt;br /&gt;";	
+		
+		//		set startInsertsField to 1 if first field is auto_increment
+		//			otherwise set to 0.
+
+	}
+
+	//	=======^^^^^^^^^^^^^^^^^^^^^^^=========  End of Definition Part ======^^^^^^^^^=====
+
+										
+		{  //		the Data
+
+			$tableData[0] = explode(",", "99,Administrator");
+			$tableData[1] = explode(",", "21,Editor");
+			$tableData[2] = explode(",", "11,Registered User");
+
+			
+			$numRows = sizeof($tableData);
+		}
+		
+		echo '$numRows : '.$numRows.'&lt;br /&gt;';
+		echo '$tableField[$numFields-1] : '.$tableField[$numFields-1].'&lt;br /&gt;';
+
+		{	//		DROP table		
+	
+		
+			$drop_SQL = "DROP TABLE ".$tableName;
+			
+			if (mysql_query($drop_SQL))  {	
+				echo "'DROP ".$tableName."' -  Successful.";
+			} else {
+				echo "'DROP ".$tableName."' - Failed.";
+			}
+		}
+		
+		echo "&lt;br /&gt;&lt;hr /&gt;&lt;br /&gt;";
+	
+		{	//		CREATE table		
+			
+			if (mysql_query($createTable_SQL))  {	
+				echo "'CREATE ".$tableName."' -  Successful.";
+			} else {
+				echo "'CREATE ".$tableName."' - Failed.";
+			}
+		}		
+		echo "&lt;br /&gt;&lt;hr /&gt;&lt;br /&gt;";
+			
+			$table_SQLinsert = "INSERT INTO ".$tableName." (";
+			
+			//$table_SQLinsert .=   "x"; 
+			foreach($tableField as $tableFieldName) {
+				$table_SQLinsert .=  $tableFieldName;
+				if($tableFieldName &lt;&gt; $tableField[$numFields-1]) {
+					$table_SQLinsert .=  ", ";
+				}
+			}
+			$table_SQLinsert .=  ") VALUES ";
+
+			$indx = 0;		
+			while($indx &lt; $numRows) {			
+				$table_SQLinsert .=  "(";
+				
+				foreach($tableField as $key =&gt; $tableFieldName) {
+					
+					$table_SQLinsert .=  "'".$tableData[$indx][$key]."'";
+					if($tableFieldName &lt;&gt; $tableField[$numFields-1]) {
+						$table_SQLinsert .=  ", ";
+					}
+
+				}
+
+				$table_SQLinsert .=  ") ";
+				if ($indx &lt; ($numRows - 1)) {
+					$table_SQLinsert .=  ",\n";
+				}
+				
+				$indx++;
+			}
+		
+			{	//	Echo and Execute the SQL and test for success   
+			
+						echo "&lt;strong&gt;&lt;u&gt;SQL:&lt;br /&gt;&lt;/u&gt;&lt;/strong&gt;";
+						echo $table_SQLinsert."&lt;br /&gt;&lt;br /&gt;";
+							
+						if (mysql_query($table_SQLinsert))  {				
+							echo "was SUCCESSFUL.&lt;br /&gt;&lt;br /&gt;";
+						} else {
+							echo "FAILED.&lt;br /&gt;&lt;br /&gt;";		
+						}
+			}
+}
+
+?&gt;</before><after/></leaf></branch><branch title="index.php"><leaf type="insert" title="index.php  01"><before>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"&gt;
+&lt;html&gt;
+&lt;head&gt;
+
+&lt;meta name="date" content="2010-07-14T14:14:35+0100" &gt;
+&lt;meta name="copyright" content="TMIT World Limited"&gt;
+&lt;meta name="keywords" content="Infinite Skills - php/MySQL Training"&gt;
+&lt;meta name="description" content="Infinite Skills - php/MySQL Training"&gt;
+&lt;meta name="ROBOTS" content="NOINDEX, NOFOLLOW"&gt;
+
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;?php
+	
+	echo '&lt;h2 style="font-family: arial, helvetica, sans-serif;" &gt;
+				Infinite Skills - php/MySQL Training
+			&lt;/h2&gt;';
+	echo '&lt;div align="left",
+				  style="
+				  font-family: arial, helvetica, sans-serif; 
+				  font-style: sans-serif; 
+				  padding-left: 50px;
+			"&gt;';
+				
+				
+		echo '&lt;a href="forms/companyCreate.php"&gt;
+				&lt;span style="color: maroon; "&gt;Create New company&lt;/span&gt;
+				&lt;/a&gt;';
+		echo '&lt;br /&gt;&lt;br /&gt;';
+
+
+	echo '&lt;/div&gt;';
+
+?&gt;
+
+
+&lt;/body&gt;
+&lt;/html&gt;</before><after/></leaf><leaf type="insert" title="index.php 02"><before>
+		echo '&lt;a href="forms/companyEdit.php"&gt;
+				&lt;span style="color: maroon; "&gt;Edit company&lt;/span&gt;
+				&lt;/a&gt;';
+		echo '&lt;br /&gt;&lt;br /&gt;';
+
+</before><after/></leaf><leaf type="insert" title="index.php +Company List"><before>				
+		echo '&lt;a href="forms/companyList.php"&gt;
+				&lt;span style="color: maroon; "&gt;Company LIST&lt;/span&gt;
+				&lt;/a&gt;';
+		echo '&lt;br /&gt;&lt;br /&gt;';
+
+</before><after/></leaf><leaf type="insert" title="index.php +company/people"><before>
+		echo '&lt;a href="forms/companySelect.php"&gt;
+				&lt;span style="color: maroon; "&gt;List People in a Company&lt;/span&gt;
+				&lt;/a&gt;';
+		echo '&lt;br /&gt;&lt;br /&gt;';
+
+</before><after/></leaf><leaf type="insert" title="index.php +companyListOrder"><before>
+		echo '&lt;a href="forms/companyListOrder.php"&gt;
+				&lt;span style="color: maroon; "&gt;List Companies&lt;/span&gt;
+				&lt;/a&gt;';
+		echo '&lt;br /&gt;&lt;br /&gt;';
+
+</before><after/></leaf></branch><branch title="forms"><leaf type="insert" title="companyList.php"><before>&lt;?php
+/*
+
+*	File:			companyList.php
+*	By:			TMIT
+*	Date:		2010-06-01
+*
+*	This script Lists the records in tCompany
+*
+*
+*=====================================
+*/
+
+{ 		//	Secure Connection Script
+		include('../../htconfig/dbConfig.php'); 
+		$dbSuccess = false;
+		$dbConnected = mysql_connect($db['hostname'],$db['username'],$db['password']);
+		
+		if ($dbConnected) {		
+			$dbSelected = mysql_select_db($db['database'],$dbConnected);
+			if ($dbSelected) {
+				$dbSuccess = true;
+			} 	
+		}
+		//	END	Secure Connection Script
+}
+
+if ($dbSuccess) {
+	
+	{	//		SELECT all companies in Name order and execute 
+		$tCompany_SQLselect = "SELECT * ";
+		$tCompany_SQLselect .= "FROM ";
+		$tCompany_SQLselect .= "tCompany ";	
+		$tPerson_SQLselect .= "ORDER BY ";
+		$tPerson_SQLselect .= "tCompany.Name";
+	
+		$tCompany_SQLselect_Query = mysql_query($tCompany_SQLselect); 	
+
+	}
+	
+	{	//		Output 
+	echo '&lt;div style=" font-family: arial, helvetica, sans-serif; "&gt;';
+	
+			echo '&lt;h2&gt;Company List&lt;/h2&gt;';
+		
+			echo "&lt;table border='1'&gt;";	
+				echo "&lt;tr style = \" font-family: arial, helvetica, sans-serif; color:maroon; \"&gt;";		
+					echo "&lt;td&gt;ID&lt;/td&gt;";
+					echo "&lt;td&gt;Company&lt;/td&gt;";
+					echo "&lt;td&gt;Address&lt;/td&gt;";
+				echo "&lt;/tr&gt;";
+		
+			while ($row = mysql_fetch_array($tCompany_SQLselect_Query, MYSQL_ASSOC)) {
+				
+			    $ID = $row['ID'];
+			    $preName = $row['preName'];
+			    $CompanyName = $row['Name'];
+			    $regType = $row['regType'];
+			    
+			    $CompanyFullName = trim($preName." ".$CompanyName." ".$regType);
+			   
+			    $StreetA = $row['StreetA'];
+			    $StreetB = $row['StreetB'];
+			    $StreetC = $row['StreetC'];
+			    $Town = $row['Town'];
+			    $County = $row['County'];
+			    $Postcode = $row['Postcode'];
+			    $COUNTRY = $row['COUNTRY'];
+		
+			    $CompanyFullAddress = $StreetA;
+		
+					if (!empty($StreetB)) { $CompanyFullAddress .=  ", ".$StreetB; }
+					if (!empty($StreetC)) { $CompanyFullAddress .=  ", ".$StreetC; }
+					if (!empty($Town)) { $CompanyFullAddress .=  ", ".$Town; }
+					if (!empty($County)) { $CompanyFullAddress .=  ", ".$County; } 
+					if (!empty($Postcode)) { $CompanyFullAddress .=  ", ".$Postcode; }			
+					if (!empty($COUNTRY)) { $CompanyFullAddress .=  ", ".$COUNTRY; }	   
+			    
+				echo "&lt;tr&gt;";
+				
+					echo "&lt;td&gt;".$ID."&lt;/td&gt;"; 
+					echo "&lt;td&gt;".$CompanyFullName."&lt;/td&gt;";
+					echo "&lt;td&gt;".$CompanyFullAddress."&lt;/td&gt;";
+			
+				echo "&lt;/tr&gt;";
+		  
+			}
+			
+			echo "&lt;/table&gt;";	
+
+	echo '&lt;/div&gt;';
+	
+	}
+	
+	mysql_free_result($tCompany_SQLselect_Query);	
+	
+}
+
+echo "&lt;br /&gt;&lt;hr /&gt;&lt;br /&gt;";
+
+echo '&lt;a href="../index.php"&gt;Quit - to homepage&lt;/a&gt;';
+
+?&gt;</before><after/></leaf><leaf type="insert" title="companyListPeople.php"><before>&lt;?php
+/*
+
+*	File:			companyListPeople.php
+*	By:			TMIT
+*	Date:		2010-06-01
+*
+*	This script Lists a record in tCompany
+*		with associated people
+*
+*
+*=====================================
+*/
+
+{ 		//	Secure Connection Script
+		include('../../htconfig/dbConfig.php'); 
+		$dbSuccess = false;
+		$dbConnected = mysql_connect($db['hostname'],$db['username'],$db['password']);
+		
+		if ($dbConnected) {		
+			$dbSelected = mysql_select_db($db['database'],$dbConnected);
+			if ($dbSelected) {
+				$dbSuccess = true;
+			} 	
+		}
+		//	END	Secure Connection Script
+}
+
+if ($dbSuccess) {
+	
+	{	//  Get the details of the company selected 
+			$companyID = $_POST["companyID"];	
+			
+			if ($companyID == 0) {
+				header("Location: companySelect.php");	
+			}
+			
+			$tCompany_SQLselect = "SELECT * ";
+			$tCompany_SQLselect .= "FROM ";
+			$tCompany_SQLselect .= "tCompany ";
+			$tCompany_SQLselect .= "WHERE ID = '".$companyID."' ";
+			
+			$tCompany_SQLselect_Query = mysql_query($tCompany_SQLselect);	
+			
+			while ($row = mysql_fetch_array($tCompany_SQLselect_Query, MYSQL_ASSOC)) {
+				$preName = $row['preName'];
+				$companyName = $row['Name'];
+				$RegType = $row['RegType'];
+				
+				$fullCoyName = trim($preName." ".$companyName." ".$RegType);
+				
+				$StreetA = $row['StreetA'];
+				$StreetB = $row['StreetB'];
+				$StreetC = $row['StreetC'];
+				$Town = $row['Town'];
+				$County = $row['County'];
+				$Postcode = $row['Postcode'];
+				$COUNTRY = $row['COUNTRY'];
+
+ 				$CompanyFullAddress = $StreetA;
+		
+					if (!empty($StreetB)) { $CompanyFullAddress .=  "&lt;br /&gt; ".$StreetB; }
+					if (!empty($StreetC)) { $CompanyFullAddress .=  "&lt;br /&gt; ".$StreetC; }
+					if (!empty($Town)) { $CompanyFullAddress .=  "&lt;br /&gt; ".$Town; }
+					if (!empty($County)) { $CompanyFullAddress .=  "&lt;br /&gt; ".$County; } 
+					if (!empty($Postcode)) { $CompanyFullAddress .=  "&amp;nbsp;&amp;nbsp;&amp;nbsp; ".$Postcode; }			
+					if (!empty($COUNTRY)) { $CompanyFullAddress .=  "&lt;br /&gt; ".$COUNTRY; }
+									 
+			}
+			
+			mysql_free_result($tCompany_SQLselect_Query);			
+	}
+	
+	{	//  Get the details of all associated Person records
+		//		and store in array:  personArray  with key &gt;$indx
+		 
+			$indx = 0;
+		
+			$tPerson_SQLselect = "SELECT * ";
+			$tPerson_SQLselect .= "FROM ";
+			$tPerson_SQLselect .= "tPerson ";
+			$tPerson_SQLselect .= "WHERE companyID = '".$companyID."' ";
+			
+			$tPerson_SQLselect_Query = mysql_query($tPerson_SQLselect);	
+			
+			while ($row = mysql_fetch_array($tPerson_SQLselect_Query, MYSQL_ASSOC)) {
+				
+				$personArray[$indx]['Salutation'] = $row['Salutation'];
+				$personArray[$indx]['FirstName'] = $row['FirstName'];
+				$personArray[$indx]['LastName'] = $row['LastName'];
+					
+				$indx++;			 
+			}
+
+			$numPersons = sizeof($personArray);
+					
+			mysql_free_result($tPerson_SQLselect_Query);			
+	}
+	
+	{	//		Output 
+	echo '&lt;div style=" font-family: arial, helvetica, sans-serif; "&gt;';
+	
+			echo '&lt;h2&gt;'.$fullCoyName.'&lt;/h2&gt;';
+			echo $CompanyFullAddress;
+			echo "&lt;br /&gt;&lt;hr /&gt;&lt;br /&gt;";
+
+			for ($indx = 0; $indx &lt; $numPersons; $indx++) {
+			    echo $personArray[$indx]['Salutation'].",";
+			    echo $personArray[$indx]['FirstName'].",";
+			    echo $personArray[$indx]['LastName']."&lt;br /&gt;";
+			}
+		
+	echo '&lt;/div&gt;';
+	
+	}
+	
+}
+
+echo "&lt;br /&gt;&lt;hr /&gt;&lt;br /&gt;";
+
+echo '&lt;a href="../index.php"&gt;Quit - to homepage&lt;/a&gt;';
+
+?&gt;</before><after/></leaf><leaf type="insert" title=" +output: companyListPeople"><before>
+			echo '&lt;div style=" font-family: arial, helvetica, sans-serif; "&gt;';
+
+					//echo '&lt;h2&gt;'.$fullCoyName.'&lt;/h2&gt;';
+					//echo $CompanyFullAddress;
+					//echo "&lt;br /&gt;&lt;hr /&gt;&lt;br /&gt;";
+								
+					echo 	  '&lt;table&gt;
+									&lt;tr valign="top"&gt;								
+										&lt;td style=" font-size: 24; 
+														font-weight: bold;" 
+														&gt;
+												'.$fullCoyName.'
+										&lt;/td&gt;
+										
+										&lt;td align="right" width="400"&gt;
+												'.$CompanyFullAddress.'			
+										&lt;/td&gt;
+									&lt;/tr&gt;
+								&lt;/table&gt;';
+					
+					echo '&lt;div style="margin-left: 100; "&gt;';
+			
+						echo '&lt;table border="1" padding="5"&gt;';
+							
+						for ($indx = 0; $indx &lt; $numPersons; $indx++) {
+						
+							 //   echo $personArray[$indx]['Salutation'].",";
+							 //   echo $personArray[$indx]['FirstName'].",";
+							 //   echo $personArray[$indx]['LastName']."&lt;br /&gt;";
+						    
+							echo '&lt;tr&gt;
+										&lt;td&gt;
+										'.$personArray[$indx]['Salutation'].'
+										&lt;/td&gt;
+										
+										&lt;td&gt;
+										'.$personArray[$indx]['FirstName'].'
+										&lt;/td&gt;
+
+										&lt;td&gt;
+										'.$personArray[$indx]['LastName'].'
+										&lt;/td&gt;
+									&lt;/tr&gt;	';			     
+						}
+						echo '&lt;/table&gt;';
+					echo '&lt;/div&gt;';		//		END:  &lt;div style="margin-left: 100; "&gt;
+			echo '&lt;/div&gt;';				//		END:	&lt;div style=" font-family..."&gt;
+
+</before><after/></leaf><leaf type="insert" title="companyListOrder.php"><before>&lt;?php
+/*
+
+*	File:			companyListOrder.php
+*	By:			TMIT
+*	Date:		2010-06-01
+*
+*	This script Lists the records in tCompany with ordering
+*	by clicking on the header for some columns
+*	Links to the people list for a company by clicking
+*	on the ID field of a row.
+*
+*
+*=============================================================
+*/
+
+{ 		//	Secure Connection Script
+		include('../../htconfig/dbConfig.php'); 
+		$dbSuccess = false;
+		$dbConnected = mysql_connect($db['hostname'],$db['username'],$db['password']);
+		
+		if ($dbConnected) {		
+			$dbSelected = mysql_select_db($db['database'],$dbConnected);
+			if ($dbSelected) {
+				$dbSuccess = true;
+			} 	
+		}
+		//	END	Secure Connection Script
+}
+
+if ($dbSuccess) {
+	
+	$thisScriptName = 'companyListOrder.php';
+	
+	{  //   Style declarations
+			$trOdd = 'style = "background-color: #BFFFCF;"';
+			$trEven = 'style = "background-color: #FCCDFF;"';
+			
+			$textFont = 'style = " font-family: arial, helvetica, sans-serif; "';
+			$textRed = 'style = " font-family: arial, helvetica, sans-serif; color:maroon; "';
+			
+	//   END: Style declarations	
+	}
+	
+	//		Get the sortorder with GET but default to Name
+	$orderClause = $_GET["fieldNameToSortOn"];	
+	if (!isset($orderClause)) {$orderClause = "Name"; }
+	
+	{	//		SELECT all companies in Name order and execute 
+		$tCompany_SQLselect = "SELECT * ";
+		$tCompany_SQLselect .= "FROM ";
+		$tCompany_SQLselect .= "tCompany ";	
+		$tCompany_SQLselect .= "ORDER BY ";
+		$tCompany_SQLselect .= "tCompany.".$orderClause;
+
+		$tCompany_SQLselect_Query = mysql_query($tCompany_SQLselect); 	
+
+	}
+	
+	{	//		Output 
+	
+	//		make each header a link to $thisScriptName with querystring or orderclause 
+	$header_ID = '&lt;a href="'.$thisScriptName.'?fieldNameToSortOn=ID"&gt;ID&lt;/a&gt;';
+	$header_Name = '&lt;a href="'.$thisScriptName.'?fieldNameToSortOn=Name"&gt;Company&lt;/a&gt;';
+	$header_Town = '&lt;a href="'.$thisScriptName.'?fieldNameToSortOn=Town"&gt;Town&lt;/a&gt;';
+	$header_County = '&lt;a href="'.$thisScriptName.'?fieldNameToSortOn=County"&gt;County&lt;/a&gt;';
+	$header_Postcode = '&lt;a href="'.$thisScriptName.'?fieldNameToSortOn=Postcode"&gt;Postcode&lt;/a&gt;';
+	$header_COUNTRY = '&lt;a href="'.$thisScriptName.'?fieldNameToSortOn=COUNTRY"&gt;COUNTRY&lt;/a&gt;';
+	
+	{	//		create a div for the whole rendering 
+	echo '&lt;div '.$textFont.' "&gt;';
+	
+		echo '&lt;h2&gt;Company List&lt;/h2&gt;';
+					
+		echo '&lt;table border="1"&gt;';	
+			echo '&lt;tr '.$textRed.'&gt;';		
+				echo '&lt;td&gt;'.$header_ID.'&lt;/td&gt;';
+				echo '&lt;td&gt;&amp;nbsp;&lt;/td&gt;';
+				echo '&lt;td&gt;'.$header_Name.'&lt;/td&gt;';
+				echo '&lt;td&gt;Address&lt;/td&gt;';
+				echo '&lt;td&gt;'.$header_Town.'&lt;/td&gt;';
+				echo '&lt;td&gt;'.$header_County.'&lt;/td&gt;';
+				echo '&lt;td&gt;'.$header_Postcode.'&lt;/td&gt;';
+				echo '&lt;td&gt;'.$header_COUNTRY.'&lt;/td&gt;';
+
+			echo '&lt;/tr&gt;';
+	
+			$indx = 0;		//		count the rows to give alternating style 
+			while ($row = mysql_fetch_array($tCompany_SQLselect_Query, MYSQL_ASSOC)) {
+				
+				$ID = $row['ID'];
+				$preName = $row['preName'];
+				$CompanyName = $row['Name'];
+				$regType = $row['regType'];				
+				$CompanyFullName = trim($CompanyName." ".$regType);
+				
+				$StreetA = $row['StreetA'];
+				$StreetB = $row['StreetB'];
+				$StreetC = $row['StreetC'];			    
+				$CompanyAddress = $StreetA;				
+				if (!empty($StreetB)) { $CompanyAddress .=  ", ".$StreetB; }
+				if (!empty($StreetC)) { $CompanyAddress .=  ", ".$StreetC; }		    
+					
+			   $Town = $row['Town'];
+			   $County = $row['County'];
+			   $Postcode = $row['Postcode'];
+			   $COUNTRY = $row['COUNTRY'];
+		
+				//		Link to companyPeopleEdit.php?companyID=$ID
+				$linkToList = '&lt;a href="companyPeopleEdit.php?companyID='.$ID.'"&gt;'.$ID.'&lt;/a&gt;';
+				
+				//		Set row style
+				if (($indx % 2) == 1) {$rowClass = $trOdd; } else { $rowClass = $trEven; }
+				echo '&lt;tr '.$rowClass.'&gt;';
+				
+					echo '&lt;td&gt;'.$linkToList.'&amp;nbsp;&lt;/td&gt;'; 
+					echo '&lt;td&gt;'.$preName.'&amp;nbsp;&lt;/td&gt;'; 
+					echo '&lt;td&gt;'.$CompanyFullName.'&amp;nbsp;&lt;/td&gt;';
+					echo '&lt;td&gt;'.$CompanyAddress.'&amp;nbsp;&lt;/td&gt;';
+					echo '&lt;td&gt;'.$Town.'&amp;nbsp;&lt;/td&gt;';
+					echo '&lt;td&gt;'.$County.'&amp;nbsp;&lt;/td&gt;';
+					echo '&lt;td&gt;'.$Postcode.'&amp;nbsp;&lt;/td&gt;';
+					echo '&lt;td&gt;'.$COUNTRY.'&amp;nbsp;&lt;/td&gt;';
+			
+				echo '&lt;/tr&gt;';
+		  
+		  		$indx++;
+		   //	END: while
+			}
+
+		echo '&lt;/table&gt;';	
+		echo ' &amp;nbsp;&amp;nbsp;^ click ID to edit record';
+
+	echo '&lt;/div&gt;';
+	//		END: create a div for the whole rendering 
+	}
+	
+	}	//		END: //		Output 
+	
+	mysql_free_result($tCompany_SQLselect_Query);	
+	
+}
+
+echo '&lt;br /&gt;&lt;hr /&gt;&lt;br /&gt;';
+
+echo '&lt;a href="../index.php"&gt;Quit - to homepage&lt;/a&gt;';
+
+?&gt;</before><after/></leaf><leaf type="insert" title="Link: companyListOrder"><before>echo '&lt;a href="companyListOrder.php"&gt;Company List&lt;/a&gt;';
+echo '&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;';</before><after/></leaf></branch></branch><branch title="Useful Stuff"><branch title="Capture"><leaf type="insert" title="as echo '"><before>echo '</before><after>';</after></leaf><leaf type="insert" title="as echo &quot;"><before>echo "</before><after>";</after></leaf><leaf type="insert" title="as echo '&lt;p&gt; % &lt;/p&gt;'"><before>echo '&lt;p&gt;
+		</before><after>		
+	&lt;/p&gt;';</after></leaf><leaf type="insert" title="as echo &quot;% &lt;br /&gt;&quot;"><before>echo "</before><after>&lt;br /&gt;";</after></leaf><leaf type="insert" title="as $variable"><before>$%0 = "</before><after>";</after><param name="variable name"/></leaf><leaf type="insert" title="&lt;span&gt;"><before>&lt;span&gt;</before><after>&lt;/span&gt;</after></leaf></branch><branch title="Insert"><leaf type="insert" title="br hr br"><before>
+echo "&lt;br /&gt;&lt;hr /&gt;&lt;br /&gt;";
+</before><after/></leaf></branch><branch title="Styles"><leaf type="insert" title="style=\&quot; \&quot;"><before> style = \" </before><after>\"</after></leaf><leaf type="insert" title="style=&quot;&quot;"><before> style="</before><after>"</after></leaf><leaf type="insert" title="Arial, red"><before> font-family: arial, helvetica, sans-serif; color:red; </before><after/></leaf><leaf type="insert" title="underline"><before> text-decoration: underline;</before><after/></leaf></branch></branch><branch title="Replacements"><leaf type="snr" title="remove ` in SQL" region="s" matchtype="normal" casesens="0" escapechars="0"><searchpat>`</searchpat><replacepat/></leaf><leaf type="snr" title="convert SQL to php" region="s" matchtype="normal" casesens="0" escapechars="1"><searchpat>\n</searchpat><replacepat> ";\n$%0_SQL .= "</replacepat><param name="variable name"/></leaf><leaf type="snr" title="escape &quot;" region="s" matchtype="normal" casesens="0" escapechars="0"><searchpat>"</searchpat><replacepat>\"</replacepat></leaf></branch><branch title="Examplets"><branch title="echo"><leaf type="insert" title="html only"><before>		&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"&gt;
+		&lt;html&gt;
+		&lt;head&gt;
+			&lt;title&gt;php Training Example&lt;/title&gt;
+			
+			&lt;meta name="author" content="TMIT" &gt;
+			&lt;meta name="date" content="2010-06-01" &gt;
+			&lt;meta name="copyright" content="TMIT"&gt;
+			&lt;meta name="keywords" content="php, training"&gt;
+			&lt;meta name="description" content="echo example"&gt;
+			&lt;meta name="ROBOTS" content="NOINDEX, NOFOLLOW"&gt;
+			&lt;meta http-equiv="content-style-type" content="text/css"&gt;
+		
+		&lt;/head&gt;
+		&lt;body&gt;
+			This is a line 
+			and this is not another line. 
+			
+		&lt;/body&gt;
+		&lt;/html&gt;</before><after/></leaf><leaf type="insert" title="add &lt;br&gt;"><before>&lt;br /&gt;
+			but this IS on a new line.</before><after/></leaf><leaf type="insert" title="add style"><before>			&lt;p style="font-family: sans-serif; color:red"&gt;
+				This is a styled paragraph
+			&lt;/p&gt;
+</before><after/></leaf><leaf type="insert" title="compare &quot; with '"><before>echo '&lt;title&gt;php Training Example 4&lt;/title&gt;';
+echo 'echo treats double quotes and single quotes differently';
+echo '&lt;br /&gt;&lt;hr /&gt;&lt;br /&gt;';
+
+echo 'single quote example&lt;br /&gt;';
+echo '&lt;br /&gt;&lt;hr /&gt;&lt;br /&gt;';
+
+
+echo "doube quote example&lt;br /&gt;";
+echo "&lt;br /&gt;&lt;hr /&gt;&lt;br /&gt;";</before><after/></leaf></branch><branch title="sprintf"><leaf type="insert" title="start here"><before>&lt;?php
+	
+echo '&lt;title&gt;printf() and sprinf() examples&lt;/title&gt;';	
+echo '&lt;p style=" text-decoration: underline;"&gt;
+		printf() and sprinf() examples		
+	&lt;/p&gt;';
+echo "&lt;br /&gt;&lt;hr /&gt;&lt;br /&gt;";
+	
+	
+printf("String Specification %s and number specification %d","1st parameter",456);
+
+
+echo "&lt;br /&gt;&lt;hr /&gt;&lt;br /&gt;";
+
+
+
+
+$formatString = "String Specification %s and number specification %d";
+$output = sprintf($formatString, "1st parameter", 456);
+echo "$output";
+
+
+echo "&lt;br /&gt;&lt;hr /&gt;&lt;br /&gt;";
+
+
+?&gt;</before><after/></leaf><leaf type="insert" title="text example"><before>echo '&lt;p style=" text-decoration: underline; font-family: arial, helvetica, sans-serif; color:red; "&gt;
+		text example		
+	&lt;/p&gt;';
+	
+$town = "Banbury";
+$county = "Oxfordshire";
+$format = 'The town of %s is in the county of %s';
+$output = sprintf($format, $town, $county);
+
+echo "&lt;p&gt;$output&lt;/p&gt;";
+
+echo "&lt;br /&gt;&lt;hr /&gt;&lt;br /&gt;";</before><after/></leaf><leaf type="insert" title="numeric example"><before>echo '&lt;p style=" text-decoration: underline; font-family: arial, helvetica, sans-serif; color:red; "&gt;
+		numeric example		
+	&lt;/p&gt;';
+
+	$town = "Banbury";
+	$ordinal = 2;
+	$county = "Oxfordshire";
+	$population = 42478;
+	$format = "The %dnd town in %s is %s with a population of %d ";
+	//             ^^           ^^    ^^                      ^^
+	//					\_____________\_____\_______________________\_____   4 specifications
+	//
+	//        and 4 arguments after the format string argument
+	//										 _____________________________________
+	//										/			/	       /         /   
+	$output = sprintf($format, $ordinal, $county, $town, $population);
+	echo "&lt;p&gt;$output&lt;/p&gt;";
+	
+	echo "&lt;br /&gt;&lt;hr /&gt;&lt;br /&gt;";
+</before><after/></leaf></branch><branch title="tables"><leaf type="insert" title="table: start here"><before>&lt;?php
+	
+
+
+echo "&lt;table border='1'&gt;";
+	
+	echo "&lt;tr&gt;";
+	
+		echo "&lt;td&gt;Salut&lt;/td&gt;";
+		echo "&lt;td&gt;FirstName&lt;/td&gt;";
+		echo "&lt;td&gt;LastName&lt;/td&gt;";
+		echo "&lt;td&gt;Company&lt;/td&gt;";
+
+	echo "&lt;/tr&gt;";
+
+	echo "&lt;tr&gt;";
+	
+		echo "&lt;td&gt;Mr&lt;/td&gt;";
+		echo "&lt;td&gt;Joe&lt;/td&gt;";
+		echo "&lt;td&gt;Bloggs&lt;/td&gt;";
+		echo "&lt;td&gt;3&lt;/td&gt;";
+
+	echo "&lt;/tr&gt;";
+
+
+echo "&lt;/table&gt;";	
+
+
+
+?&gt;	</before><after/></leaf><leaf type="insert" title="repeat static tr"><before>	
+	$ii = 0;
+	while($ii &lt; $numRows) {
+		echo "&lt;tr&gt;";
+		
+		echo "&lt;td&gt;Mr&lt;/td&gt;";
+		echo "&lt;td&gt;Joe&lt;/td&gt;";
+		echo "&lt;td&gt;Bloggs&lt;/td&gt;";
+		echo "&lt;td&gt;3&lt;/td&gt;";
+	
+		echo "&lt;/tr&gt;";
+		$ii++;
+	}
+
+</before><after/></leaf><leaf type="insert" title="getPeopleData"><before>	
+			//		read CSV data file
+	
+			$file = fopen("../dbWIP/datafile", "r");					//		open the file 'datafile' for 'r'eading 		
+			$i = 0;
+			while(!feof($file))									//		while NOT the End Of File 
+			  {		  	
+				$thisLine = fgets($file);						//		gets the next line from 'datafile'				
+				$personData[$i] = explode(",", $thisLine);//    sets 
+																		//		$personData[$i] = array( $thisLine );
+																		//		whatever's in $thisline separated by commas .
+				$i++;  												//		increment $i 
+			  }
+			fclose($file); 										//		close the file 
+			
+			$numRows = sizeof($personData);
+
+	</before><after/></leaf><leaf type="insert" title="variable td "><before>			echo "&lt;td&gt;".$personData[$ii][0]."&lt;/td&gt;";
+			echo "&lt;td&gt;".$personData[$ii][1]."&lt;/td&gt;";
+			echo "&lt;td&gt;".$personData[$ii][2]."&lt;/td&gt;";
+			echo "&lt;td&gt;".$personData[$ii][3]."&lt;/td&gt;";</before><after/></leaf></branch><branch title="dates &amp; times"><leaf type="insert" title="examples"><before>&lt;?php
+	
+echo '&lt;div style=" font-family: arial, helvetica, sans-serif; "&gt;';
+
+	echo "'date' means a number	&lt;br /&gt;";
+	echo "'date-string' means a string that looks like a date	&lt;br /&gt;";
+	
+	
+	echo "&lt;br /&gt;&lt;hr /&gt;&lt;br /&gt;";
+
+	echo "datestrings are converted to dates with the php 
+			&lt;span style = \"  text-decoration: underline;\"&gt;&lt;strong&gt;strtotime()&lt;/strong&gt;&lt;/span&gt; 
+			function&lt;br /&gt;&lt;br /&gt;&lt;br /&gt;";
+			
+	$datetimeString = "2010-06-01 15:30";
+	echo "'".$datetimeString."' is represented by ".strtotime($datetimeString)."&lt;br /&gt;&lt;br /&gt;";
+	
+	$datetimeString = "2010-06-01 15:30 + 2 weeks";
+	echo "'".$datetimeString."' is represented by ".strtotime($datetimeString)."&lt;br /&gt;&lt;br /&gt;";
+	
+	$datetimeString = "now + 4 hours";
+	echo "'".$datetimeString."' is represented by ".strtotime($datetimeString)."&lt;br /&gt;&lt;br /&gt;";
+	
+	echo "&lt;br /&gt;&lt;hr /&gt;&lt;br /&gt;";
+
+	echo "dates are Formatted with the php 
+			&lt;span style = \"  text-decoration: underline;\"&gt;&lt;strong&gt;date()&lt;/strong&gt;&lt;/span&gt; 
+			function&lt;br /&gt;&lt;br /&gt;&lt;br /&gt;";
+	$MySQLdate = date("Y-m-d H:i:s", strtotime("now"));
+
+	$humanDate = date("g:i A D j M Y", strtotime("now"));
+	
+
+	echo "'".$MySQLdate."' is how NOW is stored in MySQL&lt;br /&gt;&lt;br /&gt;";
+
+	echo "'".$humanDate."' is a more human-friendly way of expressing it.&lt;br /&gt;&lt;br /&gt;";
+
+
+echo '&lt;/div&gt;';
+
+?&gt;</before><after/></leaf></branch><branch title="Repetition"><leaf type="insert" title="do...while"><before>&lt;?php
+	
+	//			File:  doWhile_demo.php
+	
+	echo 'do ... while&lt;br /&gt;';
+	echo 'Here, the condition "$i &gt; 0" is never true but the braced code executes anyway&lt;br /&gt;&lt;br /&gt;';	
+	$i = 0;
+	do {
+	    echo 'The value of $i is: '.$i;
+	} while ($i &gt; 0);
+	
+	echo "&lt;br /&gt;&lt;hr /&gt;&lt;br /&gt;";
+
+	echo 'do ... while  operating on a numeric array&lt;br /&gt;&lt;br /&gt;';
+
+	$company=array(
+						"Aardvark motors",
+						"Abbey software",
+						"Alphmeric",
+						"Azlan",
+						"Baker Street",
+						"Burger Jack"
+	);
+	
+	$ii = 0;
+	do {
+	    echo $company[$ii]." begins with A&lt;br /&gt;";
+	    $ii++;
+	} while (substr($company[$ii],0,1) == "A");
+
+
+?&gt;
+</before><after/></leaf><leaf type="insert" title="for loop"><before>&lt;?php
+	
+	//		File:    forLoop_demo.php
+		
+
+
+	echo 'This is a for() loop operating on a numeric array&lt;br /&gt;&lt;br /&gt;';	
+	
+	$company=array(
+						"Quiches 4 You",
+						"Pie and Sauce",
+						"Sandwich Bar",
+						"Flantastic",
+						"Cake on Cake",
+						"Pizzaeria Superia",
+						"Burger Jack"
+	);
+	
+	$numRows = sizeof($company);
+	
+		
+	for ($ii = 0; $ii &lt;= $numRows; $ii++) {
+	    echo $company[$ii]."&lt;br /&gt;";
+	}
+	
+	echo "&lt;br /&gt;&lt;hr /&gt;&lt;br /&gt;";
+	
+	
+
+?&gt;</before><after/></leaf><leaf type="insert" title="foreach $key"><before>&lt;?php
+	
+
+	//		File:    foreach_demo.php		
+		
+	echo 'The foreach loop is used with ARRAYs&lt;br /&gt;&lt;br /&gt;';	
+	
+	$arr = array(
+	                         'Surrey' =&gt; 'England',
+	                         'Victoria' =&gt; 'Australia',
+	                         'Ohio' =&gt; 'USA',
+	                         'Manitoba' =&gt; 'Canada' );
+	
+	foreach ($arr as $indexName =&gt; $itemValue)
+	{
+	      echo  "\$arr[$indexName] =&gt; $itemValue&lt;br /&gt;";
+	}
+
+
+	echo "&lt;br /&gt;&lt;hr /&gt;&lt;br /&gt;";
+
+
+
+
+
+?&gt;</before><after/></leaf><leaf type="insert" title="foreach 2"><before>
+	$arrType = array(
+	                         'England' =&gt; 'County',
+	                         'Australia' =&gt; 'State',
+	                         'USA' =&gt; 'State',
+	                         'Canada' =&gt; 'Province' );
+
+	foreach ($arr as $indexName =&gt; $itemValue)
+	{
+	      echo  "The ".$arrType[$indexName]." of ".$indexName." is in ".$itemValue."&lt;br /&gt;";
+	      
+	}
+
+</before><after/></leaf></branch><branch title="SQL"><branch title="Simple"><leaf type="insert" title="SELECT"><before>&lt;?php
+/*
+
+*	File:			select_Demo.php
+*	By:			TMIT
+*	Date:		2010-06-01
+*
+*	This script demnstrates SQL SELECT
+*		and use of        mysql_fetch_array
+*
+*
+*=====================================
+*/
+
+{ 		//	Secure Connection Script
+		include('../../htconfig/dbConfig.php'); 
+		$dbSuccess = false;
+		$dbConnected = mysql_connect($db['hostname'],$db['username'],$db['password']);
+		
+		if ($dbConnected) {		
+			$dbSelected = mysql_select_db($db['database'],$dbConnected);
+			if ($dbSelected) {
+				$dbSuccess = true;
+			} else {
+				echo "DB Selection FAILed";
+			}
+		} else {
+				echo "MySQL Connection FAILed";
+		}
+		//	END	Secure Connection Script
+}
+
+if ($dbSuccess) {
+	
+	$tPerson_SQLselect = "SELECT  ";
+	$tPerson_SQLselect .= "ID, Salutation, FirstName, LastName, CompanyID ";	
+	$tPerson_SQLselect .= "FROM ";
+	$tPerson_SQLselect .= "tPerson ";			//	&lt;&lt; table name
+
+	
+	$tPerson_SQLselect_Query = mysql_query($tPerson_SQLselect); 	
+
+	$indx = 1;	
+	while ($row = mysql_fetch_array($tPerson_SQLselect_Query, MYSQL_ASSOC)) {
+	    $Salutation = $row['Salutation'];
+	    $FirstName = $row['FirstName'];
+	    $LastName = $row['LastName'];
+	    $CompanyID = $row['CompanyID'];
+	    
+	    echo $indx." - ".$Salutation." ".$FirstName." ".$LastName." [Company ".$CompanyID."]&lt;br /&gt;";
+
+	    $indx++;
+	    
+	}
+	
+	mysql_free_result($tPerson_SQLselect_Query);		
+}
+
+?&gt;</before><after/></leaf><leaf type="insert" title="Transition to TABLE"><before>&lt;?php
+/*
+
+*	File:			selectTable_Demo.php
+*	By:			TMIT
+*	Date:		2010-06-01
+*
+*	This script demonstrates SQL SELECT rendered in an  HTML Table 
+*
+*======================================================================
+*/
+
+{ 		//	Secure Connection Script
+		include('../../htconfig/dbConfig.php'); 
+		$dbSuccess = false;
+		$dbConnected = mysql_connect($db['hostname'],$db['username'],$db['password']);
+		
+		if ($dbConnected) {		
+			$dbSelected = mysql_select_db($db['database'],$dbConnected);
+			if ($dbSelected) {
+				$dbSuccess = true;
+			} else {
+				echo "DB Selection FAILed";
+			}
+		} else {
+				echo "MySQL Connection FAILed";
+		}
+		//	END	Secure Connection Script
+}
+
+if ($dbSuccess) {
+	
+	$tPerson_SQLselect = "SELECT  ";
+	$tPerson_SQLselect .= "ID, Salutation, FirstName, LastName, CompanyID ";	
+	$tPerson_SQLselect .= "FROM ";
+	$tPerson_SQLselect .= "tPerson ";			//	&lt;&lt; table name
+	
+	$tPerson_SQLselect_Query = mysql_query($tPerson_SQLselect); 	
+
+	/*
+	*			We Need a TABLE header here
+	*
+	*/
+
+	$indx = 1;	
+	while ($row = mysql_fetch_array($tPerson_SQLselect_Query, MYSQL_ASSOC)) {
+	    $Salutation = $row['Salutation'];
+	    $FirstName = $row['FirstName'];
+	    $LastName = $row['LastName'];
+	    $CompanyID = $row['CompanyID'];
+	    
+		//   We need to replace ...	
+	    echo $indx." - ".$Salutation." ".$FirstName." ".$LastName." [Company ".$CompanyID."]&lt;br /&gt;";
+		/*		with
+		*
+		*		a REPEATED HTML TABLE ROW construct here
+		*
+		*/
+	
+	    $indx++;
+	    
+	}
+	/*
+	*			We Need a TABLE end tag here after 'while' has rendered all the rows 
+	*
+	*/	
+	
+	
+	mysql_free_result($tPerson_SQLselect_Query);		
+}
+
+?&gt;</before><after/></leaf><leaf type="insert" title="SELECT with TABLE"><before>
+	echo "&lt;table border='1'&gt;";
+		
+		echo "&lt;tr&gt;";
+		
+			echo "&lt;td&gt;#&lt;/td&gt;";
+			echo "&lt;td&gt;Salut&lt;/td&gt;";
+			echo "&lt;td&gt;FirstName&lt;/td&gt;";
+			echo "&lt;td&gt;LastName&lt;/td&gt;";
+			echo "&lt;td&gt;Company&lt;/td&gt;";
+	
+		echo "&lt;/tr&gt;";
+
+	
+	$indx = 1;	
+	while ($row = mysql_fetch_array($tPerson_SQLselect_Query, MYSQL_ASSOC)) {
+	    $Salutation = $row['Salutation'];
+	    $FirstName = $row['FirstName'];
+	    $LastName = $row['LastName'];
+	    $CompanyID = $row['CompanyID'];
+	    
+		echo "&lt;tr&gt;";
+		
+			echo "&lt;td&gt;".$indx."&lt;/td&gt;";       //  this is NOT  tPerson.ID
+			echo "&lt;td&gt;".$Salutation."&lt;/td&gt;";
+			echo "&lt;td&gt;".$FirstName."&lt;/td&gt;";
+			echo "&lt;td&gt;".$LastName."&lt;/td&gt;";
+			echo "&lt;td&gt;".$CompanyID."&lt;/td&gt;";
+	
+		echo "&lt;/tr&gt;";
+
+	    $indx++;
+	    
+	}
+	
+	echo "&lt;/table&gt;";	
+</before><after/></leaf></branch><branch title="JOIN"><leaf type="insert" title="tPerson JOIN tCompany"><before>&lt;?php
+/*
+
+*	File:			selectJoin_Demo.php
+*	By:			TMIT
+*	Date:		2010-06-01
+*
+*	This script demonstrates SQL SELECT 
+*		using tPerson LEFT OUTER JOIN tCompany
+*		
+*
+*=========================================================================
+*/
+
+{ 		//	Secure Connection Script
+		include('../../htconfig/dbConfig.php'); 
+		$dbSuccess = false;
+		$dbConnected = mysql_connect($db['hostname'],$db['username'],$db['password']);
+		
+		if ($dbConnected) {		
+			$dbSelected = mysql_select_db($db['database'],$dbConnected);
+			if ($dbSelected) {
+				$dbSuccess = true;
+			} else {
+				echo "DB Selection FAILed";
+			}
+		} else {
+				echo "MySQL Connection FAILed";
+		}
+		//	END	Secure Connection Script
+}
+
+if ($dbSuccess) {
+	
+	$tPerson_SQLselect = "SELECT  ";
+	$tPerson_SQLselect .= "tPerson.ID, tPerson.Salutation, ";	
+	$tPerson_SQLselect .= "tPerson.FirstName, tPerson.LastName, ";	
+	$tPerson_SQLselect .= "tCompany.preName, tCompany.Name ";	
+	$tPerson_SQLselect .= "FROM ";
+	$tPerson_SQLselect .= "tPerson ";	
+	$tPerson_SQLselect .= "LEFT OUTER JOIN tCompany ON ";
+	$tPerson_SQLselect .= "tPerson.CompanyID = tCompany.ID ";
+
+	$tPerson_SQLselect_Query = mysql_query($tPerson_SQLselect); 	
+
+	echo "&lt;table border='1'&gt;";
+		
+		echo "&lt;tr&gt;";
+		
+			echo "&lt;td&gt;#&lt;/td&gt;";
+			echo "&lt;td&gt;Salutation&lt;/td&gt;";
+			echo "&lt;td&gt;FirstName&lt;/td&gt;";
+			echo "&lt;td&gt;LastName&lt;/td&gt;";
+			echo "&lt;td&gt;Company&lt;/td&gt;";
+	
+		echo "&lt;/tr&gt;";
+
+	
+	$indx = 1;	
+	while ($row = mysql_fetch_array($tPerson_SQLselect_Query, MYSQL_ASSOC)) {
+		
+	    $Salutation = $row['Salutation'];
+	    $FirstName = $row['FirstName'];
+	    $LastName = $row['LastName'];
+	    $CompanypreName = $row['preName'];
+	    $CompanyName = $row['Name'];
+	    
+	    $CompanyFullName = trim($CompanypreName." ".$CompanyName);
+	    
+		echo "&lt;tr&gt;";
+		
+			echo "&lt;td&gt;".$indx."&lt;/td&gt;";       //  this is NOT  tPerson.ID
+			echo "&lt;td&gt;".$Salutation."&lt;/td&gt;";
+			echo "&lt;td&gt;".$FirstName."&lt;/td&gt;";
+			echo "&lt;td&gt;".$LastName."&lt;/td&gt;";
+			echo "&lt;td&gt;".$CompanyFullName."&lt;/td&gt;";
+	
+		echo "&lt;/tr&gt;";
+
+	    $indx++;
+	    
+	}
+	
+	echo "&lt;/table&gt;";	
+
+
+	mysql_free_result($tPerson_SQLselect_Query);		
+}
+
+?&gt;</before><after/></leaf><leaf type="insert" title="refine the SQL"><before>
+	$tPerson_SQLselect = "SELECT  ";
+	$tPerson_SQLselect .= "tPerson.ID AS tPersonID, ";
+	$tPerson_SQLselect .= "tPerson.Salutation AS tPersonSalutation, ";
+	$tPerson_SQLselect .= "tPerson.FirstName AS tPersonFirstName, ";
+	$tPerson_SQLselect .= "tPerson.LastName AS tPersonLastName, ";
+	$tPerson_SQLselect .= "tCompany.preName AS tCompanypreName, ";
+	$tPerson_SQLselect .= "tCompany.Name AS tCompanyName ";
+	$tPerson_SQLselect .= "FROM ";
+	$tPerson_SQLselect .= "tPerson ";		
+	$tPerson_SQLselect .= "LEFT OUTER JOIN tCompany ON ";		
+	$tPerson_SQLselect .= "tPerson.CompanyID = tCompany.ID ";
+	</before><after/></leaf><leaf type="insert" title="matchup While"><before>		
+	    $Salutation = $row['tPersonSalutation'];
+	    $FirstName = $row['tPersonFirstName'];
+	    $LastName = $row['tPersonLastName'];
+	    $CompanypreName = $row['tCompanypreName'];
+	    $CompanyName = $row['tCompanyName'];
+	    
+</before><after/></leaf></branch><branch title="Clauses"><leaf type="insert" title="WHERE clause"><before>
+	$tPerson_SQLselect .= "WHERE ";
+	$tPerson_SQLselect .= "tCompany.ID IS NULL ";
+	$tPerson_SQLselect .= "ORDER BY ";
+	$tPerson_SQLselect .= "tPerson.LastName ASC, tPerson.FirstName ASC ";
+</before><after/></leaf><leaf type="insert" title="WHERE docs"><before>*	File:			selectJoinWHERE_Demo.php
+*	By:			TMIT
+*	Date:		2010-06-02
+*
+*	This script demonstrates SQL SELECT 
+*		using tPerson LEFT OUTER JOIN tCompany
+*		with SQL WHERE clause
+*		and SQL ORDER BY clause</before><after/></leaf></branch><branch title="Alter"><leaf type="insert" title="tPeople.Tel"><before>&lt;?php
+/*
+
+*	File:			newTableField.php
+*	By:			TMIT
+*	Date:		2010-06-01
+*
+*	This script adds a new VARCHAR field to the table $thisTable
+*
+*
+*=====================================
+*/
+
+{ 		//	Secure Connection Script
+		include('../../htconfig/dbConfig.php'); 
+		$dbSuccess = false;
+		$dbConnected = mysql_connect($db['hostname'],$db['username'],$db['password']);
+		
+		if ($dbConnected) {		
+			$dbSelected = mysql_select_db($db['database'],$dbConnected);
+			if ($dbSelected) {
+				$dbSuccess = true;
+			} 	
+		}
+		//	END	Secure Connection Script
+}
+
+if ($dbSuccess) {
+	
+		$thisTable = "tPerson";
+		$newField = "Tel";
+		$newFieldLength = 50;
+		
+		$newField_SQLalter =  "ALTER TABLE ".$thisTable;
+		$newField_SQLalter .= " ADD ".$newField;
+		$newField_SQLalter .= " VARCHAR(".$newFieldLength.") NOT NULL";
+		 
+		echo '&lt;span style = "text-decoration: underline;"&gt;
+				SQL statement:&lt;/span&gt;
+				&lt;br /&gt;'.$newField_SQLalter.'&lt;br /&gt;&lt;br /&gt;';
+				
+		if (mysql_query($newField_SQLalter))  {	
+			echo 'used to Successfully add new field '.$newField.' to '.$thisTable.'.&lt;br /&gt;&lt;br /&gt;';
+		} else {
+			echo '&lt;span style="color:red; "&gt;FAILED to add field.&lt;/span&gt;&lt;br /&gt;&lt;br /&gt;';
+			
+		}	
+
+}
+
+?&gt;</before><after/></leaf></branch></branch><branch title="Forms"><branch title="2 Page Template"><leaf type="insert" title="Form"><before>&lt;?php
+/*
+
+*	File:			twoPageModelForm.php
+*	By:			TMIT
+*	Date:		2010-06-01
+*
+*	This script defines an HTML form using php 
+*	to allow data to be sent to twoPageModelOutput.php
+*
+*
+*=====================================
+*/
+
+{ 		//	Secure Connection Script
+		include('../../htconfig/dbConfig.php'); 
+		$dbSuccess = false;
+		$dbConnected = mysql_connect($db['hostname'],$db['username'],$db['password']);
+		
+		if ($dbConnected) {		
+			$dbSelected = mysql_select_db($db['database'],$dbConnected);
+			if ($dbSelected) {
+				$dbSuccess = true;
+			} else {
+				echo "DB Selection FAILed";
+			}
+		} else {
+				echo "MySQL Connection FAILed";
+		}
+		//	END	Secure Connection Script
+}
+
+if ($dbSuccess) {
+
+
+
+}
+
+?&gt;</before><after/></leaf><leaf type="insert" title="Output"><before>&lt;?php
+/*
+
+*	File:			twoPageModelOutput.php
+*	By:			TMIT
+*	Date:		2010-06-01
+*
+*	This script collects data from twoPageModelForm.php
+*	and processes it
+*
+*
+*=====================================
+*/
+
+{ 		//	Secure Connection Script
+		include('../../htconfig/dbConfig.php'); 
+		$dbSuccess = false;
+		$dbConnected = mysql_connect($db['hostname'],$db['username'],$db['password']);
+		
+		if ($dbConnected) {		
+			$dbSelected = mysql_select_db($db['database'],$dbConnected);
+			if ($dbSelected) {
+				$dbSuccess = true;
+			} else {
+				echo "DB Selection FAILed";
+			}
+		} else {
+				echo "MySQL Connection FAILed";
+		}
+		//	END	Secure Connection Script
+}
+
+if ($dbSuccess) {
+	
+
+
+}
+
+echo "&lt;br /&gt;&lt;hr /&gt;&lt;br /&gt;";
+
+echo '&lt;a href="twoPageModelForm.php"&gt;Go Back&lt;/a&gt;';
+
+
+?&gt;</before><after/></leaf></branch><branch title="$_GET"><leaf type="insert" title="querystring 0"><before>	echo '&lt;a href="twoPageModelOutput.php?userName=infinite"&gt;Send Username&lt;/a&gt;';</before><after/></leaf><leaf type="insert" title="$_GET 0"><before>
+	$userName = $_GET["userName"];
+	echo "The userName sent was: ".$userName;
+	
+</before><after/></leaf><leaf type="insert" title="querystring 1"><before>
+	$getValue = 'TMIT World Limited';
+	
+	echo '&lt;a href="twoPageModelOutput.php?companyName='.$getValue.'&gt;Send Company Name&lt;/a&gt;';
+</before><after/></leaf><leaf type="insert" title="$_GET 1"><before>	$companyName = $_GET["companyName"];
+
+	echo "The name sent was: ".$companyName;
+</before><after/></leaf><leaf type="insert" title="querystring 2"><before>
+	echo '&lt;a href="twoPageModelOutput.php
+				?companyName=TMIT%20World%20Limited
+				&amp;userName=infinite"&gt;
+				Send Details 1
+			&lt;/a&gt;';
+
+	echo "&lt;br /&gt;&lt;br /&gt;";
+	
+	$getValue = 'TMIT%20World%20Limited';
+	$userName = "infinite";	
+	
+
+	echo '&lt;a href="twoPageModelOutput.php
+				?companyName='.$getValue.'
+				&amp;userName='.$userName.'"&gt;
+				Send Details 2
+			&lt;/a&gt;';
+
+</before><after/></leaf><leaf type="insert" title="$_GET 2"><before>
+	$userName = $_GET["userName"];
+	$companyName = $_GET["companyName"];
+
+	echo "The name sent was: ".$companyName;
+	echo "&lt;br /&gt;&lt;br /&gt;";
+	echo "The username sent was: ".$userName;
+
+</before><after/></leaf></branch><branch title="$_POST"><leaf type="insert" title="form personName"><before>
+		echo '&lt;form action="twoPageModelOutput.php" method="post"&gt;';
+		
+			echo '		Enter First Name: ';
+			echo '		&lt;input type="text" name="personFirstName" /&gt;';
+			
+			echo '		Enter Last Name: ';
+			echo '		&lt;input type="text" name="personLastName" /&gt;';
+			
+			echo '		&lt;br /&gt;&lt;br /&gt;';
+		
+	
+			echo '&lt;input type="submit" /&gt;';
+				
+		echo '&lt;/form&gt;';
+	</before><after/></leaf><leaf type="insert" title="$_POST personName"><before>
+	$personFirstName = $_POST["personFirstName"];
+	$personLastName = $_POST["personLastName"];
+
+	echo "The name you entered was: ".$personFirstName." ".$personLastName;
+</before><after/></leaf><leaf type="insert" title="form_Dropdown_Company"><before>	$tCompany_SQLselect = "SELECT  ";
+	$tCompany_SQLselect .= "ID, preName, Name ";	
+	$tCompany_SQLselect .= "FROM ";
+	$tCompany_SQLselect .= "tCompany ";
+	$tCompany_SQLselect .= "Order By Name ";
+	
+
+	$tCompany_SQLselect_Query = mysql_query($tCompany_SQLselect);	
+	
+	echo '&lt;form action="twoPageModelOutput.php" method="post"&gt;';
+	
+	echo '&lt;select name="companyID"&gt;';
+	
+		echo '&lt;option value="0" label="coyvalue" selected="selected"&gt;..select company..&lt;/option&gt;';
+ 	
+	
+			while ($row = mysql_fetch_array($tCompany_SQLselect_Query, MYSQL_ASSOC)) {
+			    $ID = $row['ID'];
+			    $preName = $row['preName'];
+			    $companyName = $row['Name'];
+			    
+			    $fullCoyName = trim($preName." ".$companyName);
+			    
+			    echo '&lt;option value="'.$ID.'"&gt;'.$fullCoyName.'&lt;/option&gt;';
+			}
+		
+			mysql_free_result($tPerson_SQLselect_Query);		
+	
+			echo '&lt;/select&gt;';
+	
+
+			echo '&lt;input type="submit" /&gt;';
+			
+	echo '&lt;/form&gt;';</before><after/></leaf><leaf type="insert" title="$POST full company detail"><before>	
+	$companyID = $_POST["companyID"];	
+	
+	$tCompany_SQLselect = "SELECT * ";
+	$tCompany_SQLselect .= "FROM ";
+	$tCompany_SQLselect .= "tCompany ";
+	$tCompany_SQLselect .= "WHERE companyID = '".$companyID."' ";
+	
+
+	$tCompany_SQLselect_Query = mysql_query($tCompany_SQLselect);	
+	
+	while ($row = mysql_fetch_array($tCompany_SQLselect_Query, MYSQL_ASSOC)) {
+		$CompanypreName = $row['preName'];
+		$CompanyName = $row['Name'];
+		$RegType = $row['RegType'];
+		
+		$StreetA = $row['StreetA'];
+		$StreetB = $row['StreetB'];
+		$StreetC = $row['StreetC'];
+		$Town = $row['Town'];
+		$County = $row['County'];
+		$Postcode = $row['Postcode'];
+		$COUNTRY = $row['COUNTRY'];
+		 
+		$CompanyFullName = trim($CompanypreName." ".$CompanyName." ".$RegType);
+		
+		$CompanyFullAddress =  $StreetA;
+		
+		if (!empty($StreetB)) { $CompanyFullAddress .=  "&lt;br /&gt;".$StreetB; }
+		if (!empty($StreetC)) { $CompanyFullAddress .=  "&lt;br /&gt;".$StreetC; }
+		if (!empty($Town)) { $CompanyFullAddress .=  "&lt;br /&gt;".$Town; }
+		if (!empty($County)) { $CompanyFullAddress .=  "&lt;br /&gt;".$County; 
+									} else {
+									  $CompanyFullAddress .=  "&lt;br /&gt;"
+									} 
+		if (!empty($Postcode)) { $CompanyFullAddress .=  "&amp;nbsp;&amp;nbsp;&amp;nbsp;".$Postcode; }
+		
+		if (!empty($COUNTRY)) { $CompanyFullAddress .=  "&lt;br /&gt;".$COUNTRY; }
+
+    
+	}
+	
+	mysql_free_result($tCompany_SQLselect_Query);			
+	
+	echo $CompanyFullName;
+	echo "&lt;br /&gt;";
+	echo $CompanyFullAddress;
+	
+</before><after/></leaf><leaf type="insert" title="companyCreate.php"><before>&lt;?php
+/*
+
+*	File:			companyCreate.php
+*	By:			TMIT
+*	Date:		2010-06-01
+*
+*	This script defines an HTML form using php 
+*	for user to enter company details - POST to companySave.php
+*
+*
+*=====================================
+*/
+
+{ 		//	Secure Connection Script
+		include('../../htconfig/dbConfig.php'); 
+		$dbSuccess = false;
+		$dbConnected = mysql_connect($db['hostname'],$db['username'],$db['password']);
+		
+		if ($dbConnected) {		
+			$dbSelected = mysql_select_db($db['database'],$dbConnected);
+			if ($dbSelected) {
+				$dbSuccess = true;
+			} else {
+				echo "DB Selection FAILed";
+			}
+		} else {
+				echo "MySQL Connection FAILed";
+		}
+		//	END	Secure Connection Script
+}
+
+if ($dbSuccess) {
+
+	echo '&lt;h2 style="font-family: arial, helvetica, sans-serif;" &gt;
+				New Company Creation Form
+			&lt;/h2&gt;';
+
+	echo "&lt;br /&gt;";
+	
+	{	//		FORM postCompany 
+		echo '&lt;form name="postCompany" action="companySave.php" method="post"&gt;';
+		
+				echo '
+				&lt;table&gt;
+					&lt;tr&gt;
+						&lt;td&gt;pre Name&lt;/td&gt;
+						&lt;td&gt;&lt;input type="text" name="preName" /&gt;&lt;/td&gt;
+					&lt;/tr&gt;
+					&lt;tr&gt;
+						&lt;td&gt;Company Name&lt;/td&gt;
+						&lt;td&gt;&lt;input type="text" name="companyName" /&gt;&lt;/td&gt;
+					&lt;/tr&gt;
+					&lt;tr&gt;
+						&lt;td&gt;Reg Type&lt;/td&gt;
+						&lt;td&gt;&lt;input type="text" name="RegType" /&gt;&lt;/td&gt;
+					&lt;/tr&gt;
+					&lt;tr&gt;
+						&lt;td&gt;Address&lt;/td&gt;
+						&lt;td&gt;&lt;input type="text" name="StreetA" /&gt;&lt;/td&gt;
+					&lt;/tr&gt;
+					&lt;tr&gt;
+						&lt;td&gt;&lt;/td&gt;
+						&lt;td&gt;&lt;input type="text" name="StreetB" /&gt;&lt;/td&gt;
+					&lt;/tr&gt;
+					&lt;tr&gt;
+						&lt;td&gt;&lt;/td&gt;
+						&lt;td&gt;&lt;input type="text" name="StreetC" /&gt;&lt;/td&gt;
+					&lt;/tr&gt;
+					&lt;tr&gt;
+						&lt;td&gt;Town&lt;/td&gt;
+						&lt;td&gt;&lt;input type="text" name="Town" /&gt;&lt;/td&gt;
+					&lt;/tr&gt;
+					&lt;tr&gt;
+						&lt;td&gt;County&lt;/td&gt;
+						&lt;td&gt;&lt;input type="text" name="County" /&gt;&lt;/td&gt;
+					&lt;/tr&gt;
+					&lt;tr&gt;
+						&lt;td&gt;Postcode&lt;/td&gt;
+						&lt;td&gt;&lt;input type="text" name="Postcode" /&gt;&lt;/td&gt;
+					&lt;/tr&gt;
+					&lt;tr&gt;
+						&lt;td&gt;COUNTRY&lt;/td&gt;
+						&lt;td&gt;&lt;input type="text" name="COUNTRY" /&gt;&lt;/td&gt;
+					&lt;/tr&gt;
+					&lt;tr&gt;
+						&lt;td&gt;&lt;/td&gt;
+						&lt;td align="right"&gt;&lt;input type="submit"  value="Save" /&gt;&lt;/td&gt;
+					&lt;/tr&gt;
+				&lt;/table&gt;
+				';
+					
+		echo '&lt;/form&gt;';
+	}
+
+}
+
+?&gt;</before><after/></leaf><leaf type="insert" title="companySave.php"><before>
+&lt;?php
+/*
+
+*	File:			companySave.php
+*	By:			TMIT
+*	Date:		2010-06-01
+*
+*	This script collects data from companyCreate.php
+*	and processes it
+*
+*
+*=====================================
+*/
+
+{ 		//	Secure Connection Script
+		include('../../htconfig/dbConfig.php'); 
+		$dbSuccess = false;
+		$dbConnected = mysql_connect($db['hostname'],$db['username'],$db['password']);
+		
+		if ($dbConnected) {		
+			$dbSelected = mysql_select_db($db['database'],$dbConnected);
+			if ($dbSelected) {
+				$dbSuccess = true;
+			} else {
+				echo "DB Selection FAILed";
+			}
+		} else {
+				echo "MySQL Connection FAILed";
+		}
+		//	END	Secure Connection Script
+}
+
+if ($dbSuccess) {
+		
+		{  //   collect the data with $_POST
+		
+			$preName = $_POST["preName"];	
+			$companyName = $_POST["companyName"];	
+			$RegType = $_POST["RegType"];	
+			$StreetA = $_POST["StreetA"];	
+			$StreetB = $_POST["StreetB"];	
+			$StreetC = $_POST["StreetC"];	
+			$Town = $_POST["Town"];	
+			$County = $_POST["County"];	
+			$Postcode = $_POST["Postcode"];	
+			$COUNTRY = $_POST["COUNTRY"];	
+		}
+			
+		{  //   SQL:     $tCompany_SQLinsert	
+		
+			$tCompany_SQLinsert = "INSERT INTO tCompany (";			
+			$tCompany_SQLinsert .=  "preName, ";
+			$tCompany_SQLinsert .=  "Name, ";
+			$tCompany_SQLinsert .=  "RegType, ";
+			$tCompany_SQLinsert .=  "StreetA, ";
+			$tCompany_SQLinsert .=  "StreetB, ";
+			$tCompany_SQLinsert .=  "StreetC, ";
+			$tCompany_SQLinsert .=  "Town, ";
+			$tCompany_SQLinsert .=  "County, ";
+			$tCompany_SQLinsert .=  "Postcode, ";	
+			$tCompany_SQLinsert .=  "COUNTRY ";
+			$tCompany_SQLinsert .=  ") ";
+			
+			$tCompany_SQLinsert .=  "VALUES (";
+			$tCompany_SQLinsert .=  "'".$preName."', ";
+			$tCompany_SQLinsert .=  "'".$companyName."', ";
+			$tCompany_SQLinsert .=  "'".$RegType."', ";
+			$tCompany_SQLinsert .=  "'".$StreetA."', ";
+			$tCompany_SQLinsert .=  "'".$StreetB."', ";
+			$tCompany_SQLinsert .=  "'".$StreetC."', ";
+			$tCompany_SQLinsert .=  "'".$Town."', ";
+			$tCompany_SQLinsert .=  "'".$County."', ";
+			$tCompany_SQLinsert .=  "'".$Postcode."', ";		
+			$tCompany_SQLinsert .=  "'".$COUNTRY."' ";
+			$tCompany_SQLinsert .=  ") ";
+		}
+		
+		{	//		check the data and process it 
+			
+			if (empty($companyName)) {
+				echo '&lt;span style="color:red; "&gt;Cannot add company with no name.&lt;/span&gt;&lt;br /&gt;&lt;br /&gt;'; 
+			} else {
+					echo '&lt;span style = "text-decoration: underline;"&gt;
+							SQL statement:&lt;/span&gt;
+							&lt;br /&gt;'.$tCompany_SQLinsert.'&lt;br /&gt;&lt;br /&gt;';
+							
+					if (mysql_query($tCompany_SQLinsert))  {	
+						echo 'used to Successfully add new company.&lt;br /&gt;&lt;br /&gt;';
+					} else {
+						echo '&lt;span style="color:red; "&gt;FAILED to add new company.&lt;/span&gt;&lt;br /&gt;&lt;br /&gt;';
+						
+					}	
+			}
+		}
+
+}
+
+echo "&lt;br /&gt;&lt;hr /&gt;&lt;br /&gt;";
+
+echo '&lt;a href="companyCreate.php"&gt;Create another company&lt;/a&gt;';
+echo "&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;";
+echo '&lt;a href="../index.php"&gt;Quit - to homepage&lt;/a&gt;';
+
+?&gt;</before><after/></leaf><leaf type="insert" title="companyEdit"><before>&lt;?php
+/*
+
+*	File:			companyEdit.php
+*	By:			TMIT
+*	Date:		2010-06-01
+*
+*	This script defines an HTML form using a dropdown
+* 		to select which company to edit.
+*
+*
+*=====================================
+*/
+
+{ 		//	Secure Connection Script
+		include('../../htconfig/dbConfig.php'); 
+		$dbSuccess = false;
+		$dbConnected = mysql_connect($db['hostname'],$db['username'],$db['password']);
+		
+		if ($dbConnected) {		
+			$dbSelected = mysql_select_db($db['database'],$dbConnected);
+			if ($dbSelected) {
+				$dbSuccess = true;
+			} else {
+				echo "DB Selection FAILed";
+			}
+		} else {
+				echo "MySQL Connection FAILed";
+		}
+		//	END	Secure Connection Script
+}
+
+if ($dbSuccess) {
+
+	$tCompany_SQLselect = "SELECT  ";
+	$tCompany_SQLselect .= "ID, preName, Name ";	
+	$tCompany_SQLselect .= "FROM ";
+	$tCompany_SQLselect .= "tCompany ";
+	$tCompany_SQLselect .= "Order By Name ";
+	
+
+	$tCompany_SQLselect_Query = mysql_query($tCompany_SQLselect);	
+	
+	echo '&lt;form action="companyEditForm.php" method="post"&gt;';
+	
+	echo '&lt;select name="companyID"&gt;';
+	
+		echo '&lt;option value="0" label="coyvalue" selected="selected"&gt;..select company..&lt;/option&gt;';
+ 	
+	
+			while ($row = mysql_fetch_array($tCompany_SQLselect_Query, MYSQL_ASSOC)) {
+			    $ID = $row['ID'];
+			    $preName = $row['preName'];
+			    $companyName = $row['Name'];
+			    
+			    $fullCoyName = trim($preName." ".$companyName);
+			    
+			    echo '&lt;option value="'.$ID.'"&gt;'.$fullCoyName.'&lt;/option&gt;';
+			}
+		
+			mysql_free_result($tCompany_SQLselect_Query);		
+	
+			echo '&lt;/select&gt;';
+	
+
+			echo '&lt;input type="submit" /&gt;';
+			
+	echo '&lt;/form&gt;';
+
+}
+
+echo "&lt;br /&gt;&lt;hr /&gt;&lt;br /&gt;";
+
+
+echo '&lt;a href="../index.php"&gt;Quit - to homepage&lt;/a&gt;';
+
+
+?&gt;</before><after/></leaf><leaf type="insert" title="companyEditForm.php"><before>&lt;?php
+/*
+
+*	File:			companyEditForm.php
+*	By:			TMIT
+*	Date:		2010-06-01
+*
+*	This script defines an HTML form to load company details
+*	and POST changed fields to companyEditSave.php
+*
+*
+*=====================================
+*/
+
+{ 		//	Secure Connection Script
+		include('../../htconfig/dbConfig.php'); 
+		$dbSuccess = false;
+		$dbConnected = mysql_connect($db['hostname'],$db['username'],$db['password']);
+		
+		if ($dbConnected) {		
+			$dbSelected = mysql_select_db($db['database'],$dbConnected);
+			if ($dbSelected) {
+				$dbSuccess = true;
+			} else {
+				echo "DB Selection FAILed";
+			}
+		} else {
+				echo "MySQL Connection FAILed";
+		}
+		//	END	Secure Connection Script
+}
+
+if ($dbSuccess) {
+
+	{	//  Get the details of the company selected 
+			$companyID = $_POST["companyID"];	
+			
+			$tCompany_SQLselect = "SELECT * ";
+			$tCompany_SQLselect .= "FROM ";
+			$tCompany_SQLselect .= "tCompany ";
+			$tCompany_SQLselect .= "WHERE ID = '".$companyID."' ";
+			
+			$tCompany_SQLselect_Query = mysql_query($tCompany_SQLselect);	
+			
+			while ($row = mysql_fetch_array($tCompany_SQLselect_Query, MYSQL_ASSOC)) {
+				$current_preName = $row['preName'];
+				$current_Name = $row['Name'];
+				$current_RegType = $row['RegType'];
+				
+				$current_StreetA = $row['StreetA'];
+				$current_StreetB = $row['StreetB'];
+				$current_StreetC = $row['StreetC'];
+				$current_Town = $row['Town'];
+				$current_County = $row['County'];
+				$current_Postcode = $row['Postcode'];
+				$current_COUNTRY = $row['COUNTRY'];
+				 
+			}
+			
+			//mysql_free_result($tCompany_SQLselect_Query);			
+	}
+
+	echo '&lt;h2 style="font-family: arial, helvetica, sans-serif;" &gt;
+				Company EDIT Form
+			&lt;/h2&gt;';
+	
+	{	//		FORM postCompany 
+		echo '&lt;form name="postCompany" action="companyUpdate.php" method="post"&gt;';
+		
+				echo '&lt;input type="hidden" name="companyID" value="'.$companyID.'"/&gt;';
+				echo '
+				&lt;table&gt;
+					&lt;tr&gt;
+						&lt;td&gt;pre Name&lt;/td&gt;
+						&lt;td&gt;&lt;input type="text" name="preName" value="'.$current_preName.'"/&gt;&lt;/td&gt;
+					&lt;/tr&gt;
+					&lt;tr&gt;
+						&lt;td&gt;Company Name&lt;/td&gt;
+						&lt;td&gt;&lt;input type="text" name="companyName" value="'.$current_Name.'"/&gt;&lt;/td&gt;
+					&lt;/tr&gt;
+					&lt;tr&gt;
+						&lt;td&gt;Reg Type&lt;/td&gt;
+						&lt;td&gt;&lt;input type="text" name="RegType" value="'.$current_RegType.'"/&gt;&lt;/td&gt;
+					&lt;/tr&gt;
+					&lt;tr&gt;
+						&lt;td&gt;Address&lt;/td&gt;
+						&lt;td&gt;&lt;input type="text" name="StreetA" value="'.$current_StreetA.'"/&gt;&lt;/td&gt;
+					&lt;/tr&gt;
+					&lt;tr&gt;
+						&lt;td&gt;&lt;/td&gt;
+						&lt;td&gt;&lt;input type="text" name="StreetB" value="'.$current_StreetB.'"/&gt;&lt;/td&gt;
+					&lt;/tr&gt;
+					&lt;tr&gt;
+						&lt;td&gt;&lt;/td&gt;
+						&lt;td&gt;&lt;input type="text" name="StreetC" value="'.$current_StreetC.'"/&gt;&lt;/td&gt;
+					&lt;/tr&gt;
+					&lt;tr&gt;
+						&lt;td&gt;Town&lt;/td&gt;
+						&lt;td&gt;&lt;input type="text" name="Town" value="'.$current_Town.'"/&gt;&lt;/td&gt;
+					&lt;/tr&gt;
+					&lt;tr&gt;
+						&lt;td&gt;County&lt;/td&gt;
+						&lt;td&gt;&lt;input type="text" name="County" value="'.$current_County.'"/&gt;&lt;/td&gt;
+					&lt;/tr&gt;
+					&lt;tr&gt;
+						&lt;td&gt;Postcode&lt;/td&gt;
+						&lt;td&gt;&lt;input type="text" name="Postcode" value="'.$current_Postcode.'"/&gt;&lt;/td&gt;
+					&lt;/tr&gt;
+					&lt;tr&gt;
+						&lt;td&gt;COUNTRY&lt;/td&gt;
+						&lt;td&gt;&lt;input type="text" name="COUNTRY" value="'.$current_COUNTRY.'"/&gt;&lt;/td&gt;
+					&lt;/tr&gt;
+					&lt;tr&gt;
+						&lt;td&gt;&lt;/td&gt;
+						&lt;td align="right"&gt;&lt;input type="submit"  value="Save" /&gt;&lt;/td&gt;
+					&lt;/tr&gt;
+				&lt;/table&gt;
+				';
+					
+		echo '&lt;/form&gt;';
+	}
+	
+	echo "&lt;br /&gt;&lt;hr /&gt;&lt;br /&gt;";
+
+echo '&lt;a href="companyEdit.php"&gt;Select a different company&lt;/a&gt;';
+echo "&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;";
+echo '&lt;a href="../index.php"&gt;Quit - to homepage&lt;/a&gt;';
+
+
+}
+
+?&gt;</before><after/></leaf><leaf type="insert" title="companyUpdate"><before>
+&lt;?php
+/*
+
+*	File:			companyUpdate.php
+*	By:			TMIT
+*	Date:		2010-06-01
+*
+*	This script collects data from companyEdit.php
+*	and updates the database record
+*
+*
+*=====================================
+*/
+
+{ 		//	Secure Connection Script
+		include('../../htconfig/dbConfig.php'); 
+		$dbSuccess = false;
+		$dbConnected = mysql_connect($db['hostname'],$db['username'],$db['password']);
+		
+		if ($dbConnected) {		
+			$dbSelected = mysql_select_db($db['database'],$dbConnected);
+			if ($dbSelected) {
+				$dbSuccess = true;
+			} else {
+				echo "DB Selection FAILed";
+			}
+		} else {
+				echo "MySQL Connection FAILed";
+		}
+		//	END	Secure Connection Script
+}
+
+if ($dbSuccess) {
+		
+		{  //   collect the data with $_POST
+		
+			$companyID = $_POST["companyID"];	
+			
+			$preName = $_POST["preName"];	
+			$companyName = $_POST["companyName"];	
+			$RegType = $_POST["RegType"];	
+			$StreetA = $_POST["StreetA"];	
+			$StreetB = $_POST["StreetB"];	
+			$StreetC = $_POST["StreetC"];	
+			$Town = $_POST["Town"];	
+			$County = $_POST["County"];	
+			$Postcode = $_POST["Postcode"];	
+			$COUNTRY = $_POST["COUNTRY"];	
+		}
+
+			
+		{  //   SQL:     UPDATE tCompany record
+		
+			$tCompany_SQLupdate = "UPDATE tCompany SET ";			
+			$tCompany_SQLupdate .=  "preName = '".$preName."', ";
+			$tCompany_SQLupdate .=  "Name = '".$companyName."', ";
+			$tCompany_SQLupdate .=  "RegType = '".$RegType."', ";
+			$tCompany_SQLupdate .=  "StreetA = '".$StreetA."', ";
+			$tCompany_SQLupdate .=  "StreetB = '".$StreetB."', ";
+			$tCompany_SQLupdate .=  "StreetC = '".$StreetC."', ";
+			$tCompany_SQLupdate .=  "Town = '".$Town."', ";
+			$tCompany_SQLupdate .=  "County = '".$County."', ";
+			$tCompany_SQLupdate .=  "Postcode = '".$Postcode."', ";	
+			$tCompany_SQLupdate .=  "COUNTRY = '".$COUNTRY."' ";
+			$tCompany_SQLupdate .=  "WHERE ID = '".$companyID."' "; 			
+		}
+		
+		{	//		check the data and process it 
+			
+			if (empty($companyName)) {
+				echo '&lt;span style="color:red; "&gt;Cannot make the company name empty.&lt;/span&gt;&lt;br /&gt;&lt;br /&gt;'; 
+			} else {
+					echo '&lt;span style = "text-decoration: underline;"&gt;
+							SQL statement:&lt;/span&gt;
+							&lt;br /&gt;'.$tCompany_SQLupdate.'&lt;br /&gt;&lt;br /&gt;';
+							
+					if (mysql_query($tCompany_SQLupdate))  {	
+						echo 'used to Successfully update the company.&lt;br /&gt;&lt;br /&gt;';
+					} else {
+						echo '&lt;span style="color:red; "&gt;FAILED to update the company.&lt;/span&gt;&lt;br /&gt;&lt;br /&gt;';
+						
+					}	
+			}
+		}
+
+}
+
+echo "&lt;br /&gt;&lt;hr /&gt;&lt;br /&gt;";
+
+echo '&lt;a href="companyEdit.php"&gt;Update another company&lt;/a&gt;';
+echo "&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;";
+echo '&lt;a href="../index.php"&gt;Quit - to homepage&lt;/a&gt;';
+
+?&gt;</before><after/></leaf></branch></branch><branch title="Redirection"><leaf type="insert" title="trap CompanyID==0"><before>			
+			if ($companyID == 0) {
+				header("Location: companyEdit.php");	
+			}
+			
+</before><after/></leaf></branch><branch title="Output SELECT"><leaf type="insert" title="companySelect - docs"><before>*	This script defines an HTML form using a dropdown
+* 		to select a company from tCompany
+*		and passes tCompany.ID to companyListPeople.php</before><after/></leaf><leaf type="insert" title="companySelect - RegType"><before>			    $RegType = $row['RegType'];
+			    
+			    $fullCoyName = trim($preName." ".$companyName." ".$RegType);
+</before><after/></leaf></branch><branch title="Complex Output"><leaf type="insert" title="companyListPeople + header row"><before>						echo '&lt;tr&gt;
+									&lt;td&gt;Salutation&lt;/td&gt;
+									&lt;td&gt;FirstName&lt;/td&gt;
+									&lt;td&gt;LastName&lt;/td&gt;
+									&lt;td&gt;Telephone&lt;/td&gt;
+								&lt;/tr&gt;	';	</before><after/></leaf><leaf type="insert" title="companyListPeople + array"><before>				$personArray[$indx]['Tel'] = $row['Tel'];
+</before><after/></leaf><leaf type="insert" title="companyListPeople + output Tel"><before>										&lt;td&gt;
+										'.$personArray[$indx]['Tel'].'
+										&lt;/td&gt;
+</before><after/></leaf><leaf type="insert" title="companyListPeople + styleVars"><before>		
+			$tdOdd = 'style = "background-color: #FF8F8F;"';
+			$tdEven = 'style = "background-color: #76E9FF;"';
+			
+</before><after/></leaf><leaf type="insert" title="companyListPeople + altStyle"><before>        					if (($indx % 2) == 1) {$rowClass = $tdOdd; } else { $rowClass = $tdEven; }  
+ 
+							echo '&lt;tr '.$rowClass.'&gt;
+</before><after/></leaf></branch></branch><branch title="Examplets6"><branch title="isset"><leaf type="insert" title="companyWithPeople.php"><before>&lt;?php
+/*
+
+*	File:			companyWithPeople.php
+*	By:			TMIT
+*	Date:		2010-06-01
+*
+*	This script uses a dropdown to select a company from tCompany
+*		tests it with isset and displays company details
+*		with a list of people associated
+*
+*
+*=====================================
+*/
+
+{ 		//	Secure Connection Script
+		include('../../htconfig/dbConfig.php'); 
+		$dbSuccess = false;
+		$dbConnected = mysql_connect($db['hostname'],$db['username'],$db['password']);
+		
+		if ($dbConnected) {		
+			$dbSelected = mysql_select_db($db['database'],$dbConnected);
+			if ($dbSelected) {
+				$dbSuccess = true;
+			} 	
+		}
+		//	END	Secure Connection Script
+}
+
+if ($dbSuccess) {
+		
+		$companyID = $_POST["companyID"];
+		if (isset($companyID) AND $companyID &gt; 0){
+
+			//  vvvvvvv  This is most of the contents of  vvvvvvv
+			//  vv            companyListPeople.php            vv  
+			
+			{	//  Get the details of the company selected 
+										
+					$tCompany_SQLselect = "SELECT * ";
+					$tCompany_SQLselect .= "FROM ";
+					$tCompany_SQLselect .= "tCompany ";
+					$tCompany_SQLselect .= "WHERE ID = '".$companyID."' ";
+					
+					$tCompany_SQLselect_Query = mysql_query($tCompany_SQLselect);	
+					
+					while ($row = mysql_fetch_array($tCompany_SQLselect_Query, MYSQL_ASSOC)) {
+						$preName = $row['preName'];
+						$companyName = $row['Name'];
+						$RegType = $row['RegType'];
+						
+						$fullCoyName = trim($preName." ".$companyName." ".$RegType);
+						
+						$StreetA = $row['StreetA'];
+						$StreetB = $row['StreetB'];
+						$StreetC = $row['StreetC'];
+						$Town = $row['Town'];
+						$County = $row['County'];
+						$Postcode = $row['Postcode'];
+						$COUNTRY = $row['COUNTRY'];
+		
+		 				$CompanyFullAddress = $StreetA;
+				
+							if (!empty($StreetB)) { $CompanyFullAddress .=  "&lt;br /&gt; ".$StreetB; }
+							if (!empty($StreetC)) { $CompanyFullAddress .=  "&lt;br /&gt; ".$StreetC; }
+							if (!empty($Town)) { $CompanyFullAddress .=  "&lt;br /&gt; ".$Town; }
+							if (!empty($County)) { $CompanyFullAddress .=  "&lt;br /&gt; ".$County; } 
+							if (!empty($Postcode)) { $CompanyFullAddress .=  "&amp;nbsp;&amp;nbsp;&amp;nbsp; ".$Postcode; }			
+							if (!empty($COUNTRY)) { $CompanyFullAddress .=  "&lt;br /&gt; ".$COUNTRY; }
+											 
+					}
+					
+					mysql_free_result($tCompany_SQLselect_Query);			
+			}
+			
+			{	//  Get the details of all associated Person records
+				//		and store in array:  personArray  with key &gt;$indx
+				 
+					$indx = 0;
+				
+					$tPerson_SQLselect = "SELECT * ";
+					$tPerson_SQLselect .= "FROM ";
+					$tPerson_SQLselect .= "tPerson ";
+					$tPerson_SQLselect .= "WHERE companyID = '".$companyID."' ";
+					
+					$tPerson_SQLselect_Query = mysql_query($tPerson_SQLselect);	
+					
+					while ($row = mysql_fetch_array($tPerson_SQLselect_Query, MYSQL_ASSOC)) {
+						
+						$personArray[$indx]['Salutation'] = $row['Salutation'];
+						$personArray[$indx]['FirstName'] = $row['FirstName'];
+						$personArray[$indx]['LastName'] = $row['LastName'];
+						$personArray[$indx]['Tel'] = $row['Tel'];
+							
+						$indx++;			 
+					}
+		
+					$numPersons = sizeof($personArray);
+							
+					mysql_free_result($tPerson_SQLselect_Query);			
+			}
+			
+			{	//		Output 
+				//		Remember ^^   these braces are for teaching purposes only
+				//							and are not a necessary part of the php code
+				
+					$tdOdd = 'style = "background-color: #FF8F8F;"';
+					$tdEven = 'style = "background-color: #76E9FF;"';
+					
+					echo '&lt;div style=" font-family: arial, helvetica, sans-serif; "&gt;';
+		
+							echo 	  '&lt;table&gt;
+											&lt;tr valign="top"&gt;								
+												&lt;td style=" font-size: 24; 
+																font-weight: bold;" 
+																&gt;
+														'.$fullCoyName.'
+												&lt;/td&gt;
+												
+												&lt;td align="right" width="400"&gt;
+														'.$CompanyFullAddress.'			
+												&lt;/td&gt;
+											&lt;/tr&gt;
+										&lt;/table&gt;';
+							
+							echo '&lt;div style="margin-left: 100; "&gt;';
+					
+								echo '&lt;table border="1" padding="5"&gt;';
+								echo '&lt;tr&gt;
+											&lt;td&gt;Salutation&lt;/td&gt;
+											&lt;td&gt;FirstName&lt;/td&gt;
+											&lt;td&gt;LastName&lt;/td&gt;
+											&lt;td&gt;Telephone&lt;/td&gt;
+										&lt;/tr&gt;	';	
+																		
+								for ($indx = 0; $indx &lt; $numPersons; $indx++) {
+								
+		        					if (($indx % 2) == 1) {$rowClass = $tdOdd; } else { $rowClass = $tdEven; }  
+		 
+									echo '&lt;tr '.$rowClass.'&gt;
+												&lt;td&gt;
+												'.$personArray[$indx]['Salutation'].'
+												&lt;/td&gt;
+												
+												&lt;td&gt;
+												'.$personArray[$indx]['FirstName'].'
+												&lt;/td&gt;
+		
+												&lt;td&gt;
+												'.$personArray[$indx]['LastName'].'
+												&lt;/td&gt;
+		
+												&lt;td&gt;
+												'.$personArray[$indx]['Tel'].'
+												&lt;/td&gt;
+												
+											&lt;/tr&gt;	';			     
+								}
+								echo '&lt;/table&gt;';
+							echo '&lt;/div&gt;';		//		END:  &lt;div style="margin-left: 100; "&gt;
+					echo '&lt;/div&gt;';				//		END:	&lt;div style=" font-family..."&gt;
+		
+		
+		
+			//		END: Output section 
+			}
+	
+			
+		} else {
+
+			//  vvvvvvv  This is exactly the contents of  vvvvvvv
+			//  vv            companySelect.php            vv  
+
+			{	//	Select company from dropdowm
+				
+				$tCompany_SQLselect = "SELECT  ";
+				$tCompany_SQLselect .= "ID, preName, Name ";	
+				$tCompany_SQLselect .= "FROM ";
+				$tCompany_SQLselect .= "tCompany ";
+				$tCompany_SQLselect .= "Order By Name ";
+				
+			
+				$tCompany_SQLselect_Query = mysql_query($tCompany_SQLselect);	
+				
+				echo '&lt;form action="companyWithPeople.php" method="post"&gt;';
+				
+				echo '&lt;select name="companyID"&gt;';
+				
+					echo '&lt;option value="0" label="coyvalue" selected="selected"&gt;..select company..&lt;/option&gt;';
+			 	
+				
+						while ($row = mysql_fetch_array($tCompany_SQLselect_Query, MYSQL_ASSOC)) {
+						    $ID = $row['ID'];
+						    $preName = $row['preName'];
+						    $companyName = $row['Name'];
+						    $RegType = $row['RegType'];
+						    
+						    $fullCoyName = trim($preName." ".$companyName." ".$RegType);
+						    
+						    echo '&lt;option value="'.$ID.'"&gt;'.$fullCoyName.'&lt;/option&gt;';
+						}
+					
+						mysql_free_result($tCompany_SQLselect_Query);		
+				
+						echo '&lt;/select&gt;';
+				
+			
+						echo '&lt;input type="submit" /&gt;';
+						
+				echo '&lt;/form&gt;';
+				//	END:  Select company from dropdowm
+			}
+			
+		}
+		
+
+//		END:	if ($dbSuccess)
+}
+
+echo "&lt;br /&gt;&lt;hr /&gt;&lt;br /&gt;";
+
+unset($companyID);
+echo '&lt;a href="companyWithPeople.php"&gt;Select Another&lt;/a&gt;';
+echo '&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;';
+echo '&lt;a href="../index.php"&gt;Quit - to homepage&lt;/a&gt;';
+
+
+
+?&gt;</before><after/></leaf></branch><branch title="Multi part forms"><leaf type="insert" title="companyPeopleEdit.php"><before>&lt;?php
+/*
+
+*	File:			companyPeopleEdit.php
+*	By:			TMIT
+*	Date:		2010-06-01
+*
+*	This script uses a dropdown to select a company from tCompany;
+*		*	tests it with isset and displays company details
+*		*	with a list of people associated
+*		*	provide an 'edit' link to edit a tPerson record
+*		*	and an 'add' FORM at the end to Add a new tPerson
+*		*	with selected company as companyID value 
+*
+*
+*=====================================
+*/
+
+{ 		//	Secure Connection Script
+		include('../../htconfig/dbConfig.php'); 
+		$dbSuccess = false;
+		$dbConnected = mysql_connect($db['hostname'],$db['username'],$db['password']);
+		
+		if ($dbConnected) {		
+			$dbSelected = mysql_select_db($db['database'],$dbConnected);
+			if ($dbSelected) {
+				$dbSuccess = true;
+			} 	
+		}
+		//	END	Secure Connection Script
+}
+
+// $thisScriptName separated out as it's now used several times
+$thisScriptName = "companyPeopleEdit.php";
+
+if ($dbSuccess) {
+		
+		$companyID = $_POST["companyID"];
+		if(!isset($companyID)) {$companyID = $_GET["companyID"]; }
+
+		if (isset($companyID) AND $companyID &gt; 0){
+
+			{	//  Get the details of the company selected 
+										
+					$tCompany_SQLselect = "SELECT * ";
+					$tCompany_SQLselect .= "FROM ";
+					$tCompany_SQLselect .= "tCompany ";
+					$tCompany_SQLselect .= "WHERE ID = '".$companyID."' ";
+					
+					$tCompany_SQLselect_Query = mysql_query($tCompany_SQLselect);	
+					
+					while ($row = mysql_fetch_array($tCompany_SQLselect_Query, MYSQL_ASSOC)) {
+						$preName = $row['preName'];
+						$companyName = $row['Name'];
+						$RegType = $row['RegType'];
+						
+						$fullCoyName = trim($preName." ".$companyName." ".$RegType);
+						
+						$StreetA = $row['StreetA'];
+						$StreetB = $row['StreetB'];
+						$StreetC = $row['StreetC'];
+						$Town = $row['Town'];
+						$County = $row['County'];
+						$Postcode = $row['Postcode'];
+						$COUNTRY = $row['COUNTRY'];
+		
+		 				$CompanyFullAddress = $StreetA;
+				
+							if (!empty($StreetB)) { $CompanyFullAddress .=  "&lt;br /&gt; ".$StreetB; }
+							if (!empty($StreetC)) { $CompanyFullAddress .=  "&lt;br /&gt; ".$StreetC; }
+							if (!empty($Town)) { $CompanyFullAddress .=  "&lt;br /&gt; ".$Town; }
+							if (!empty($County)) { $CompanyFullAddress .=  "&lt;br /&gt; ".$County; } 
+							if (!empty($Postcode)) { $CompanyFullAddress .=  "&amp;nbsp;&amp;nbsp;&amp;nbsp; ".$Postcode; }			
+							if (!empty($COUNTRY)) { $CompanyFullAddress .=  "&lt;br /&gt; ".$COUNTRY; }										 
+					}					
+					mysql_free_result($tCompany_SQLselect_Query);			
+			}
+			
+			{	//  Get the details of all associated Person records
+				//		and store in array:  personArray  with key &gt;$indx
+				 
+					$indx = 0;
+				
+					$tPerson_SQLselect = "SELECT * ";
+					$tPerson_SQLselect .= "FROM ";
+					$tPerson_SQLselect .= "tPerson ";
+					$tPerson_SQLselect .= "WHERE companyID = '".$companyID."' ";
+					
+					$tPerson_SQLselect_Query = mysql_query($tPerson_SQLselect);	
+					
+					while ($row = mysql_fetch_array($tPerson_SQLselect_Query, MYSQL_ASSOC)) {
+						
+						//		we need this to pass to personEdit.php
+						$personArray[$indx]['ID'] = $row['ID'];
+						//^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+						
+						$personArray[$indx]['Salutation'] = $row['Salutation'];
+						$personArray[$indx]['FirstName'] = $row['FirstName'];
+						$personArray[$indx]['LastName'] = $row['LastName'];
+						$personArray[$indx]['Tel'] = $row['Tel'];
+							
+						$indx++;			 
+					}
+		
+					$numPersons = sizeof($personArray);
+							
+					mysql_free_result($tPerson_SQLselect_Query);			
+			}
+		
+			{	//		Output 
+
+					$tdOdd = 'style = "background-color: #FF8F8F;"';
+					$tdEven = 'style = "background-color: #76E9FF;"';
+					
+					echo '&lt;div style=" font-family: arial, helvetica, sans-serif; "&gt;';
+		
+							{	//		Table to render tCompany detail	
+							echo 	  '&lt;table&gt;
+											&lt;tr valign="top"&gt;								
+												&lt;td style=" font-size: 24; 
+																font-weight: bold;" 
+																&gt;
+														'.$fullCoyName.'
+												&lt;/td&gt;
+												
+												&lt;td align="right" width="400"&gt;
+														'.$CompanyFullAddress.'			
+												&lt;/td&gt;
+											&lt;/tr&gt;
+										&lt;/table&gt;';
+							//		END: Table to render tCompany detail
+							}
+															
+							echo '&lt;div style="margin-left: 100; "&gt;';
+				
+							{	//		Table of tPerson records
+							echo '&lt;table border="1" padding="5"&gt;';
+								echo '&lt;tr&gt;
+											&lt;td&gt;Salutation&lt;/td&gt;
+											&lt;td&gt;FirstName&lt;/td&gt;
+											&lt;td&gt;LastName&lt;/td&gt;
+											&lt;td&gt;Telephone&lt;/td&gt;
+											&lt;td width="90"&gt;&lt;/td&gt;
+										&lt;/tr&gt;	';	
+																		
+								for ($indx = 0; $indx &lt; $numPersons; $indx++) {
+									$thisID = $personArray[$indx]['ID'];
+									$personEditLink = '&lt;a href="personEditForm.php?personID='.$thisID.'"&gt;Edit&lt;/a&gt;';
+									
+		        					if (($indx % 2) == 1) {$rowClass = $tdOdd; } else { $rowClass = $tdEven; }  
+		 
+									echo '&lt;tr '.$rowClass.' height="20"&gt;
+									
+												&lt;td&gt;'.$personArray[$indx]['Salutation'].'&lt;/td&gt;
+												
+												&lt;td&gt;'.$personArray[$indx]['FirstName'].'&lt;/td&gt;
+		
+												&lt;td&gt;'.$personArray[$indx]['LastName'].'&lt;/td&gt;
+		
+												&lt;td&gt;'.$personArray[$indx]['Tel'].'&lt;/td&gt;
+												
+												&lt;td&gt;'.$personEditLink.'&lt;/td&gt;
+												
+											&lt;/tr&gt;	';			     
+								}
+							echo '&lt;/table&gt;';
+							//		END:  Table of tPerson records
+							}	
+																				
+							{	//		FORM to INSERT person		
+
+								{	//		Create the personAdd form fields
+								$fld_Salutation = '&lt;input type="text" name="Salutation" size="5" maxlength="10"/&gt;';
+								$fld_FirstName = '&lt;input type="text" name="FirstName"  size="10" maxlength="50"/&gt;';
+								$fld_LastName = '&lt;input type="text" name="LastName"  size="10" maxlength="50"/&gt;';
+								$fld_Tel = '&lt;input type="text" name="Tel"  size="10" maxlength="50"/&gt;';			
+								//		END: Create the personAdd form fields
+								}						
+
+							echo '&lt;form action="personInsert.php" method="post"&gt;';
+								echo '&lt;input type="hidden" name="companyID" value="'.$companyID.'" /&gt;';
+								
+								echo '&lt;table&gt;';		
+										echo '&lt;tr&gt;
+												&lt;td colspan="5"&gt;&lt;/td&gt;
+											&lt;/tr&gt;	';	
+										echo '&lt;tr&gt;
+												&lt;td colspan="5"&gt;&lt;hr /&gt;&lt;/td&gt;
+											&lt;/tr&gt;	';	
+										echo '&lt;tr&gt;
+												&lt;td colspan="5"&gt;&lt;/td&gt;
+											&lt;/tr&gt;	';	
+										echo '&lt;tr&gt;
+												&lt;td&gt;'.$fld_Salutation.'&lt;/td&gt;
+												&lt;td&gt;'.$fld_FirstName.'&lt;/td&gt;
+												&lt;td&gt;'.$fld_LastName.'&lt;/td&gt;
+												&lt;td&gt;'.$fld_Tel.'&lt;/td&gt;
+												&lt;td&gt;&lt;input type="submit" value="Add" /&gt;&lt;/td&gt;
+											&lt;/tr&gt;	';	
+								echo '&lt;/table&gt;';
+							echo '&lt;/form&gt;';
+							//		END: FORM to INSERT person		
+							}
+																								
+							echo '&lt;/div&gt;';		//		END:  &lt;div style="margin-left: 100; "&gt;
+							
+					echo '&lt;/div&gt;';				//		END:	&lt;div style=" font-family..."&gt;
+		
+			//		END: Output section 
+			}
+				
+		} else {
+
+			{	//	Select company from dropdowm
+				
+				$tCompany_SQLselect = "SELECT  ";
+				$tCompany_SQLselect .= "ID, preName, Name ";	
+				$tCompany_SQLselect .= "FROM ";
+				$tCompany_SQLselect .= "tCompany ";
+				$tCompany_SQLselect .= "Order By Name ";
+					
+				$tCompany_SQLselect_Query = mysql_query($tCompany_SQLselect);	
+				
+				echo '&lt;form action="'.$thisScriptName.'" method="post"&gt;';
+				
+				echo '&lt;select name="companyID"&gt;';
+				
+					echo '&lt;option value="0" label="coyvalue" selected="selected"&gt;..select company..&lt;/option&gt;';
+			 	
+						while ($row = mysql_fetch_array($tCompany_SQLselect_Query, MYSQL_ASSOC)) {
+						    $ID = $row['ID'];
+						    $preName = $row['preName'];
+						    $companyName = $row['Name'];
+						    $RegType = $row['RegType'];
+						    
+						    $fullCoyName = trim($preName." ".$companyName." ".$RegType);
+						    
+						    echo '&lt;option value="'.$ID.'"&gt;'.$fullCoyName.'&lt;/option&gt;';
+						}
+					
+						mysql_free_result($tCompany_SQLselect_Query);		
+				
+						echo '&lt;/select&gt;';
+				
+						echo '&lt;input type="submit" /&gt;';
+						
+				echo '&lt;/form&gt;';
+				//	END:  Select company from dropdowm
+			}
+			
+		}
+		
+//		END:	if ($dbSuccess)
+}
+
+echo "&lt;br /&gt;&lt;hr /&gt;&lt;br /&gt;";
+
+unset($companyID);
+echo '&lt;a href="'.$thisScriptName.'"&gt;Select Another&lt;/a&gt;';
+echo '&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;';
+echo '&lt;a href="../index.php"&gt;Quit - to homepage&lt;/a&gt;';
+
+?&gt;</before><after/></leaf><leaf type="insert" title="personInsert.php"><before>&lt;?php
+/*
+
+*	File:			personInsert.php
+*	By:			TMIT
+*	Date:		2010-06-01
+*
+*	This script INSERTS the supplied fields to tPerson
+*	if INSERT is OK then use header to return to companyPeopleEdit
+*	else report error
+*
+*
+*=====================================
+*/
+
+{ 		//	Secure Connection Script
+		include('../../htconfig/dbConfig.php'); 
+		$dbSuccess = false;
+		$dbConnected = mysql_connect($db['hostname'],$db['username'],$db['password']);
+		
+		if ($dbConnected) {		
+			$dbSelected = mysql_select_db($db['database'],$dbConnected);
+			if ($dbSelected) {
+				$dbSuccess = true;
+			} else {
+				echo "DB Selection FAILed";
+			}
+		} else {
+				echo "MySQL Connection FAILed";
+		}
+		//	END	Secure Connection Script
+}
+
+
+if ($dbSuccess) {
+
+		$Salutation = $_POST["Salutation"];	
+		$FirstName = $_POST["FirstName"];	
+		$LastName = $_POST["LastName"];	
+		$Tel = $_POST["Tel"];	
+		$companyID = $_POST["companyID"];	
+	
+		$tPerson_SQLinsert = "INSERT INTO tPerson (";			
+		$tPerson_SQLinsert .=  "Salutation, ";
+		$tPerson_SQLinsert .=  "FirstName, ";
+		$tPerson_SQLinsert .=  "LastName, ";
+		$tPerson_SQLinsert .=  "Tel, ";	
+		$tPerson_SQLinsert .=  "companyID ";
+		$tPerson_SQLinsert .=  ") ";
+		
+		$tPerson_SQLinsert .=  "VALUES (";
+		$tPerson_SQLinsert .=  "'".$Salutation."', ";
+		$tPerson_SQLinsert .=  "'".$FirstName."', ";
+		$tPerson_SQLinsert .=  "'".$LastName."', ";
+		$tPerson_SQLinsert .=  "'".$Tel."', ";	
+		$tPerson_SQLinsert .=  "'".$companyID."' ";
+		$tPerson_SQLinsert .=  ") ";
+
+
+		if (mysql_query($tPerson_SQLinsert))  {	
+		
+			header("Location: companyPeopleEdit.php?companyID=".$companyID);
+			
+		} else {
+			
+			echo '&lt;span style="color:red; "&gt;FAILED to add new person.&lt;/span&gt;&lt;br /&gt;&lt;br /&gt;';
+			echo "&lt;br /&gt;&lt;hr /&gt;&lt;br /&gt;";
+			echo '&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;';
+			echo '&lt;a href="../index.php"&gt;Quit - to homepage&lt;/a&gt;';
+			
+		}	
+
+}
+
+?&gt;</before><after/></leaf><leaf type="insert" title="personEditForm.php"><before>&lt;?php
+/*
+
+*	File:			personEditForm.php
+*	By:			TMIT
+*	Date:		2010-06-01
+*
+*	This script defines an HTML form to load person details
+*	and POST changed fields back to this form and UPDATE
+*	If UPDATE is good then use header(Location: ...
+*	to return to the companyPeopleEdit form
+*
+*
+*=====================================
+*/
+
+{ 		//	Secure Connection Script
+		include('../../htconfig/dbConfig.php'); 
+		$dbSuccess = false;
+		$dbConnected = mysql_connect($db['hostname'],$db['username'],$db['password']);
+		
+		if ($dbConnected) {		
+			$dbSelected = mysql_select_db($db['database'],$dbConnected);
+			if ($dbSelected) {
+				$dbSuccess = true;
+			} else {
+				echo "DB Selection FAILed";
+			}
+		} else {
+				echo "MySQL Connection FAILed";
+		}
+		//	END	Secure Connection Script
+}
+
+$thisScriptName = "personEditForm.php";
+
+if ($dbSuccess) {
+
+	$saveClicked = $_POST["saveClicked"];
+	
+	{	//	SAVE button was clicked 
+		if (isset($saveClicked)) {
+			unset($saveClicked);
+			
+			$companyID = $_POST["companyID"];	
+			
+			$personID = $_POST["personID"];	
+			$Salutation = $_POST["Salutation"];	
+			$FirstName = $_POST["FirstName"];	
+			$LastName = $_POST["LastName"];	
+			$Telephone = $_POST["Telephone"];	
+	
+			$tPerson_SQLupdate = "UPDATE tPerson SET ";			
+			$tPerson_SQLupdate .=  "Salutation = '".$Salutation."', ";
+			$tPerson_SQLupdate .=  "FirstName = '".$FirstName."', ";
+			$tPerson_SQLupdate .=  "LastName = '".$LastName."', ";
+			$tPerson_SQLupdate .=  "Tel = '".$Telephone."' ";
+			$tPerson_SQLupdate .=  "WHERE ID = '".$personID."' "; 	
+	
+			if (mysql_query($tPerson_SQLupdate))  {	
+				echo header("Location: companyPeopleEdit.php?companyID=".$companyID);
+			} else {
+				echo '&lt;span style="color:red; "&gt;FAILED to update the company.&lt;/span&gt;&lt;br /&gt;&lt;br /&gt;';
+				
+			}				
+		}	
+	//	END:  SAVE button was clicked 	ie. if (isset($saveClicked))
+	}		
+	
+	{	//  Get the details of the person selected 
+			$personID = $_GET["personID"];	
+					
+			$tPerson_SQLselect = "SELECT * ";
+			$tPerson_SQLselect .= "FROM ";
+			$tPerson_SQLselect .= "tPerson ";
+			$tPerson_SQLselect .= "WHERE ID = '".$personID."' ";
+			
+			$tPerson_SQLselect_Query = mysql_query($tPerson_SQLselect);	
+			
+			while ($row = mysql_fetch_array($tPerson_SQLselect_Query, MYSQL_ASSOC)) {
+				$current_Salutation = $row['Salutation'];
+				$current_FirstName = $row['FirstName'];
+				$current_LastName = $row['LastName'];
+				$current_Tel = $row['Tel'];
+				
+				$companyID = $row['CompanyID'];
+				 
+			}
+			
+			mysql_free_result($tPerson_SQLselect_Query);			
+	//  END: Get the details of the person selected 
+	}
+
+	echo '&lt;h2 style="font-family: arial, helvetica, sans-serif;" &gt;
+				Person EDIT Form
+			&lt;/h2&gt;';
+	
+	{	//		FORM postPerson 
+		echo '&lt;form name="postPerson" action="'.$thisScriptName.'" method="post"&gt;';
+		
+				echo '&lt;input type="hidden" name="personID" value="'.$personID.'"/&gt;';
+				echo '&lt;input type="hidden" name="companyID" value="'.$companyID.'"/&gt;';
+				echo '&lt;input type="hidden" name="saveClicked" value="1"/&gt;';
+
+				echo '
+				&lt;table&gt;
+					&lt;tr&gt;
+						&lt;td&gt;Salutation&lt;/td&gt;
+						&lt;td&gt;&lt;input type="text" name="Salutation" value="'.$current_Salutation.'"/&gt;&lt;/td&gt;
+					&lt;/tr&gt;
+					&lt;tr&gt;
+						&lt;td&gt;FirstName&lt;/td&gt;
+						&lt;td&gt;&lt;input type="text" name="FirstName" value="'.$current_FirstName.'"/&gt;&lt;/td&gt;
+					&lt;/tr&gt;
+					&lt;tr&gt;
+						&lt;td&gt;LastName&lt;/td&gt;
+						&lt;td&gt;&lt;input type="text" name="LastName" value="'.$current_LastName.'"/&gt;&lt;/td&gt;
+					&lt;/tr&gt;
+					&lt;tr&gt;
+						&lt;td&gt;Telephone&lt;/td&gt;
+						&lt;td&gt;&lt;input type="text" name="Telephone" value="'.$current_Tel.'"/&gt;&lt;/td&gt;
+					&lt;/tr&gt;
+					&lt;tr&gt;
+						&lt;td&gt;&lt;/td&gt;
+						&lt;td align="right"&gt;&lt;input type="submit"  value="Save" /&gt;&lt;/td&gt;
+					&lt;/tr&gt;
+				&lt;/table&gt;
+				';
+					
+		echo '&lt;/form&gt;';
+	//	END:	FORM postPerson 
+	}
+	
+	echo "&lt;br /&gt;&lt;hr /&gt;&lt;br /&gt;";
+	
+	echo '&lt;a href="companyPeopleEdit.php?companyID='.$companyID.'"&gt;Return to Company/People List&lt;/a&gt;';
+	echo "&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;";
+	echo '&lt;a href="../index.php"&gt;Quit - to homepage&lt;/a&gt;';
+
+}
+
+?&gt;</before><after/></leaf></branch><branch title="DropDowns"><leaf type="insert" title="personEditForm mod 1"><before>	
+		$fld_personID = '&lt;input type="hidden" name="personID" value="'.$personID.'"/&gt;';
+		$fld_companyID = '&lt;input type="hidden" name="companyID" value="'.$companyID.'"/&gt;';
+		$fld_saveClicked = '&lt;input type="hidden" name="saveClicked" value="1"/&gt;';
+
+		$fld_FirstName = '&lt;input type="text" name="FirstName" value="'.$current_FirstName.'"/&gt;';
+		$fld_LastName = '&lt;input type="text" name="LastName" value="'.$current_LastName.'"/&gt;';
+		$fld_Tel = '&lt;input type="text" name="Telephone" value="'.$current_Tel.'"/&gt;';
+		
+		$fld_Salutation = '&lt;input type="text" name="Salutation" value="'.$current_Salutation.'"/&gt;';
+
+		echo '&lt;form name="postPerson" action="'.$thisScriptName.'" method="post"&gt;';
+		
+				echo $fld_personID;
+				echo $fld_companyID;
+				echo $fld_saveClicked;
+				echo '
+				&lt;table&gt;
+					&lt;tr&gt;
+						&lt;td&gt;Salutation&lt;/td&gt;
+						&lt;td&gt;'.$fld_Salutation.'&lt;/td&gt;
+					&lt;/tr&gt;
+					&lt;tr&gt;
+						&lt;td&gt;First Name&lt;/td&gt;
+						&lt;td&gt;'.$fld_FirstName.'&lt;/td&gt;
+					&lt;/tr&gt;
+					&lt;tr&gt;
+						&lt;td&gt;Last Name&lt;/td&gt;
+						&lt;td&gt;'.$fld_LastName.'&lt;/td&gt;
+					&lt;/tr&gt;
+					&lt;tr&gt;
+						&lt;td&gt;Telephone&lt;/td&gt;
+						&lt;td&gt;'.$fld_Tel.'&lt;/td&gt;
+					&lt;/tr&gt;
+					&lt;tr&gt;
+						&lt;td&gt;&lt;/td&gt;
+						&lt;td align="right"&gt;&lt;input type="submit"  value="Save" /&gt;&lt;/td&gt;
+					&lt;/tr&gt;					
+				&lt;/table&gt;
+				';
+					
+		echo '&lt;/form&gt;';
+		
+</before><after/></leaf><leaf type="insert" title="personEditForm select salut"><before>
+		{	//	create the Salutation DROPDOWN  FIELD 
+			$salut_SQL =  "SELECT lookupValue FROM tLookup ";
+			$salut_SQL .= "WHERE lookupType = 'Salutation' ";
+			$salut_SQL .= "ORDER By lookupOrder ";
+			
+			$salut_SQL_Query = mysql_query($salut_SQL);	
+
+			$fld_Salutation = '&lt;select name="Salutation"&gt;';
+	 	
+				while ($row = mysql_fetch_array($salut_SQL_Query, MYSQL_ASSOC)) {
+				    $salutValue = $row['lookupValue'];
+				    if ($current_Salutation == $salutValue) { 
+				    	$selectedFlag = " selected";
+				    } else { 
+				    	$selectedFlag = "";
+				    }
+				    $fld_Salutation .= '&lt;option'.$selectedFlag.'&gt;'.$salutValue.'&lt;/option&gt;';
+				}
+			
+				mysql_free_result($salut_SQL_Query);		
+	
+			$fld_Salutation .= '&lt;/select&gt;';
+			
+		//	END: create the Salutation DROPDOWN  FIELD 
+		}	
+
+</before><after/></leaf><leaf type="insert" title="personEditForm select coy"><before>
+		{	//	create the Company DROPDOWN  FIELD 
+			$companyList_SQL =  "SELECT ID, prename, Name, RegType FROM tCompany ";
+			$companyList_SQL .= "ORDER By Name ";
+			
+			$companyList_SQL_Query = mysql_query($companyList_SQL);	
+
+			$fld_companyID = '&lt;select name="companyID"&gt;';
+				//$fld_Salutation .= '&lt;option selected="selected"&gt;&lt;/option&gt;';
+	 	
+				while ($row = mysql_fetch_array($companyList_SQL_Query, MYSQL_ASSOC)) {
+				    $dd_companyID = $row['ID'];
+				    $dd_preName = $row['preName'];
+				    $dd_companyName = $row['Name'];
+				    $dd_RegType = $row['RegType'];
+				    
+				    $fullCoyName = trim($dd_preName." ".$dd_companyName." ".$dd_RegType);
+				    
+				    if ($dd_companyID == $companyID) { 
+				    	$selectedFlag = " selected";
+				    } else { 
+				    	$selectedFlag = "";
+				    }
+				    $fld_companyID .= '&lt;option value="'.$dd_companyID.'"';
+				    $fld_companyID .= $selectedFlag.'&gt;'.$fullCoyName.'&lt;/option&gt;';
+				}
+			
+				mysql_free_result($companyList_SQL_Query);		
+	
+			$fld_companyID .= '&lt;/select&gt;';
+			
+		//	END: create the Company DROPDOWN  FIELD 
+		}	
+
+</before><after/></leaf></branch></branch><branch title="Exercise Answers"><branch title="Getting Started"><leaf type="insert" title="Ex 1 (0207)"><before>// Getting started - Exercise 1
+//	Create a Bluefish snippet to render a 3-point HTML unordered list.
+
+echo "&lt;ul&gt;";
+	echo "&lt;li&gt;&lt;/li&gt;";
+	echo "&lt;li&gt;&lt;/li&gt;";
+	echo "&lt;li&gt;&lt;/li&gt;";
+echo "&lt;/ul&gt;";
+
+</before><after/></leaf><leaf type="insert" title="Ex 2 (0207)" tooltip="&#9;&#9;"><before>&lt;?php
+	
+// Getting started - Exercise 2
+//	Create a php script using your list from 1 above 
+
+//	FIRST create the php tags (using snippet "Basics:php Tags simple")
+//		then paste your Exercise 1 snippet between the tags
+
+echo "&lt;ul&gt;";
+	echo "&lt;li&gt;&lt;/li&gt;";
+	echo "&lt;li&gt;&lt;/li&gt;";
+	echo "&lt;li&gt;&lt;/li&gt;";
+echo "&lt;/ul&gt;";
+
+?&gt;</before><after/></leaf><leaf type="insert" title="Ex 3 (0207)"><before>&lt;?php
+	
+/*			Exercise 3 - database and table creation:
+
+			save this snippet as "exercise3.php"  in the htdocs directory
+			
+			the open:   http://localhost/exercise3.php
+			
+			The result will tell you if you correctly completed exercise 3
+
+*/
+
+$databaseName = "DVD";
+$username = "root";
+$password = "";
+$hostname = "localhost";
+
+$dbh = mysql_connect($hostname, $username, $password) 
+or die("Unable to connect to MySQL");
+
+$selected = mysql_select_db($databaseName,$dbh) 
+or die("Could not connect to Database".$databaseName);
+
+echo "Exercise 3: database DVD correctly created.&lt;br /&gt;&lt;br /&gt;";
+
+
+$sqlTxt = "SELECT * FROM tArtists";
+	
+	if (mysql_query($sqlTxt)) {
+		echo "Exercise 3: table tArtists correctly created.&lt;br /&gt;&lt;br /&gt;";
+	} else {
+		echo "Exercise 3: table tArtists NOT created.&lt;br /&gt;&lt;br /&gt;";
+		
+	}; 	
+
+$sqlTxt = "SELECT * FROM tRecordings";
+	
+	if (mysql_query($sqlTxt)) {
+		echo "Exercise 3: table tRecordings correctly created.&lt;br /&gt;&lt;br /&gt;";
+	} else {
+		echo "Exercise 3: table tRecordings NOT created.&lt;br /&gt;&lt;br /&gt;";
+		
+	}; 	
+
+
+?&gt;</before><after/></leaf></branch><branch title="MySQL &amp; php together"><leaf type="insert" title="Ex 1 (0309)"><before/><after/></leaf></branch><branch title="Echo to a Browser"><leaf type="insert" title="Ex 1 (0409)"><before>Mr,John,Sable,2
+Mr,Alfred,Doones,2
+Mr,Eric,Wentner,2
+Miss,Peta,Sable,2
+Mrs,Dorothy,Sable,2</before><after/></leaf><leaf type="insert" title="Ex 2 (0409)"><before>&lt;?php
+/*
+
+*	File:			exercise4.php
+*	By:			TMIT
+*	Date:		
+*
+*	This script INSERTS contents of csv file csvExercise4 into tPerson
+*
+*
+*=====================================
+*/
+
+{ 		//	Secure Connection Script
+		include('../../htconfig/dbConfig.php'); 
+		$dbSuccess = false;
+		$dbConnected = mysql_connect($db['hostname'],$db['username'],$db['password']);
+		
+		if ($dbConnected) {		
+			$dbSelected = mysql_select_db($db['database'],$dbConnected);
+			if ($dbSelected) {
+				$dbSuccess = true;
+			} 	
+		}
+		//	END	Secure Connection Script
+}
+
+if ($dbSuccess) {
+	
+		$tableName = "tPerson";	
+		$CSVfilename = "csvExercise4";
+		
+		$tableField = array(
+					'Salutation',
+					'FirstName',
+					'LastName',
+					'CompanyID'
+		);
+		$numFields = sizeof($tableField);
+
+
+
+	//	=======^^^^^^^^^^^^^^^^^^^^^^^=========  End of Definition Part ======^^^^^^^^^=====
+
+										
+		{  //		read CSV data file
+	
+			$file = fopen($CSVfilename, "r"); 		
+			$i = 0;
+			while(!feof($file))
+			  {		  	
+				$thisLine = fgets($file);		
+				$tableData[$i] = explode(",", $thisLine);
+				$i++; 
+			  }
+			fclose($file);
+			
+			$numRows = sizeof($tableData);
+		}
+		echo '$numRows : '.$numRows.'&lt;br /&gt;';
+		echo '$tableField[$numFields-1] : '.$tableField[$numFields-1].'&lt;br /&gt;';
+
+		
+			$table_SQLinsert = "INSERT INTO ".$tableName." (";
+			
+			//$table_SQLinsert .=   "x"; 
+			foreach($tableField as $tableFieldName) {
+				$table_SQLinsert .=  $tableFieldName;
+				if($tableFieldName &lt;&gt; $tableField[$numFields-1]) {
+					$table_SQLinsert .=  ", ";
+				}
+			}
+			$table_SQLinsert .=  ") VALUES ";
+
+			$indx = 0;		
+			while($indx &lt; $numRows) {			
+				$table_SQLinsert .=  "(";
+				
+				foreach($tableField as $key =&gt; $tableFieldName) {
+					
+					$table_SQLinsert .=  "'".$tableData[$indx][$key]."'";
+					if($tableFieldName &lt;&gt; $tableField[$numFields-1]) {
+						$table_SQLinsert .=  ", ";
+					}
+
+				}
+
+				$table_SQLinsert .=  ") ";
+				if ($indx &lt; ($numRows - 1)) {
+					$table_SQLinsert .=  ",\n";
+				}
+				
+				$indx++;
+			}
+		
+			{	//	Echo and Execute the SQL and test for success   
+			
+						echo "&lt;strong&gt;&lt;u&gt;SQL:&lt;br /&gt;&lt;/u&gt;&lt;/strong&gt;";
+						echo $table_SQLinsert."&lt;br /&gt;&lt;br /&gt;";
+							
+						if (mysql_query($table_SQLinsert))  {				
+							echo "was SUCCESSFUL.&lt;br /&gt;&lt;br /&gt;";
+						} else {
+							echo "FAILED.&lt;br /&gt;&lt;br /&gt;";		
+						}
+			}
+}
+
+?&gt;</before><after/></leaf></branch><branch title="2 Page Model"><leaf type="insert" title="Ex 1 (0510)"><before>&lt;?php
+/*
+{ 		//	Secure Connection Script
+		include('../../htconfig/dbConfig.php'); 
+		$dbSuccess = false;
+		$dbConnected = mysql_connect($db['hostname'],$db['username'],$db['password']);
+		
+		if ($dbConnected) {		
+			$dbSelected = mysql_select_db($db['database'],$dbConnected);
+			if ($dbSelected) {
+				$dbSuccess = true;
+			} 	
+		}
+		//	END	Secure Connection Script
+}
+
+if ($dbSuccess) {
+	
+	{	//		SELECT all companies in Name order and execute 
+		$tCompany_SQLselect = "SELECT * ";
+		$tCompany_SQLselect .= "FROM ";
+		$tCompany_SQLselect .= "tCompany ";	
+		$tPerson_SQLselect .= "ORDER BY ";
+		$tPerson_SQLselect .= "tCompany.Name";
+	
+		$tCompany_SQLselect_Query = mysql_query($tCompany_SQLselect); 	
+
+	}
+	
+	echo '&lt;div style=" font-family: arial, helvetica, sans-serif; "&gt;';
+			echo "&lt;table border='1'&gt;";	
+				echo "&lt;tr style = \" font-family: arial, helvetica, sans-serif; color:maroon; \"&gt;";		
+					echo "&lt;td&gt;ID&lt;/td&gt;";
+					echo "&lt;td&gt;Company&lt;/td&gt;";
+					echo "&lt;td&gt;Address&lt;/td&gt;";
+				echo "&lt;/tr&gt;";
+		
+			while ($row = mysql_fetch_array($tCompany_SQLselect_Query, MYSQL_ASSOC)) {
+				
+			    $ID = $row['ID'];
+			    $preName = $row['preName'];
+			    $CompanyName = $row['Name'];
+			    $regType = $row['regType'];
+			    
+			    $CompanyFullName = trim($preName." ".$CompanyName." ".$regType);
+			   
+			    $StreetA = $row['StreetA'];
+			    $StreetB = $row['StreetB'];
+			    $StreetC = $row['StreetC'];
+			    $Town = $row['Town'];
+			    $County = $row['County'];
+			    $Postcode = $row['Postcode'];
+			    $COUNTRY = $row['COUNTRY'];
+		
+			    $CompanyFullAddress = $StreetA;
+		
+					if (!empty($StreetB)) { $CompanyFullAddress .=  ", ".$StreetB; }
+					if (!empty($StreetC)) { $CompanyFullAddress .=  ", ".$StreetC; }
+					if (!empty($Town)) { $CompanyFullAddress .=  ", ".$Town; }
+					if (!empty($County)) { $CompanyFullAddress .=  ", ".$County; } 
+					if (!empty($Postcode)) { $CompanyFullAddress .=  ", ".$Postcode; }			
+					if (!empty($COUNTRY)) { $CompanyFullAddress .=  ", ".$COUNTRY; }	   
+			    
+				echo "&lt;tr&gt;";
+				
+					echo "&lt;td&gt;".$ID."&lt;/td&gt;"; 
+					echo "&lt;td&gt;".$CompanyFullName."&lt;/td&gt;";
+					echo "&lt;td&gt;".$CompanyFullAddress."&lt;/td&gt;";
+			
+				echo "&lt;/tr&gt;";
+		  
+			}
+			
+			echo "&lt;/table&gt;";	
+
+	echo '&lt;/div&gt;';
+	
+	mysql_free_result($tCompany_SQLselect_Query);	
+	
+}
+
+echo "&lt;br /&gt;&lt;hr /&gt;&lt;br /&gt;";
+
+echo '&lt;a href="../index.php"&gt;Quit - to homepage&lt;/a&gt;';
+
+?&gt;</before><after/></leaf></branch><branch title="1 page model"><leaf type="insert" title="addEmailFieldTo_tPerson"><before>&lt;?php
+/*
+
+*	File:			addEmailFieldTo_tPerson.php
+*	By:			TMIT
+*	Date:		2010-06-01
+*
+*	This script adds a new VARCHAR field to the table $thisTable
+*
+*
+*=====================================
+*/
+
+{ 		//	Secure Connection Script
+		include('../../htconfig/dbConfig.php'); 
+		$dbSuccess = false;
+		$dbConnected = mysql_connect($db['hostname'],$db['username'],$db['password']);
+		
+		if ($dbConnected) {		
+			$dbSelected = mysql_select_db($db['database'],$dbConnected);
+			if ($dbSelected) {
+				$dbSuccess = true;
+			} 	
+		}
+		//	END	Secure Connection Script
+}
+
+if ($dbSuccess) {
+	
+		$thisTable = "tPerson";
+		$newField = "eMail";
+		$newFieldLength = 100;
+		
+		$newField_SQLalter =  "ALTER TABLE ".$thisTable;
+		$newField_SQLalter .= " ADD ".$newField;
+		$newField_SQLalter .= " VARCHAR(".$newFieldLength.") NOT NULL";
+		 
+		echo '&lt;span style = "text-decoration: underline;"&gt;
+				SQL statement:&lt;/span&gt;
+				&lt;br /&gt;'.$newField_SQLalter.'&lt;br /&gt;&lt;br /&gt;';
+				
+		if (mysql_query($newField_SQLalter))  {	
+			echo 'used to Successfully add new field '.$newField.' to '.$thisTable.'.&lt;br /&gt;&lt;br /&gt;';
+		} else {
+			echo '&lt;span style="color:red; "&gt;FAILED to add field.&lt;/span&gt;&lt;br /&gt;&lt;br /&gt;';
+			
+		}	
+
+}
+
+?&gt;</before><after/></leaf><leaf type="insert" title="Ex_06_1_companyPeopleEdit"><before>&lt;?php
+/*
+
+*	File:			companyPeopleEdit.php
+*	By:			TMIT
+*	Date:		2010-06-01
+*
+*	This script uses a dropdown to select a company from tCompany;
+*		*	tests it with isset and displays company details
+*		*	with a list of people associated
+*		*	provide an 'edit' link to edit a tPerson record
+*		*	and an 'add' FORM at the end to Add a new tPerson
+*		*	with selected company as companyID value 
+*
+*
+*=====================================
+*/
+
+{ 		//	Secure Connection Script
+		include('../../htconfig/dbConfig.php'); 
+		$dbSuccess = false;
+		$dbConnected = mysql_connect($db['hostname'],$db['username'],$db['password']);
+		
+		if ($dbConnected) {		
+			$dbSelected = mysql_select_db($db['database'],$dbConnected);
+			if ($dbSelected) {
+				$dbSuccess = true;
+			} 	
+		}
+		//	END	Secure Connection Script
+}
+
+// $thisScriptName separated out as it's now used several times
+$thisScriptName = "companyPeopleEdit.php";
+
+if ($dbSuccess) {
+		
+		$companyID = $_POST["companyID"];
+		if(!isset($companyID)) {$companyID = $_GET["companyID"]; }
+
+		if (isset($companyID) AND $companyID &gt; 0){
+
+			{	//  Get the details of the company selected 
+										
+					$tCompany_SQLselect = "SELECT * ";
+					$tCompany_SQLselect .= "FROM ";
+					$tCompany_SQLselect .= "tCompany ";
+					$tCompany_SQLselect .= "WHERE ID = '".$companyID."' ";
+					
+					$tCompany_SQLselect_Query = mysql_query($tCompany_SQLselect);	
+					
+					while ($row = mysql_fetch_array($tCompany_SQLselect_Query, MYSQL_ASSOC)) {
+						$preName = $row['preName'];
+						$companyName = $row['Name'];
+						$RegType = $row['RegType'];
+						
+						$fullCoyName = trim($preName." ".$companyName." ".$RegType);
+						
+						$StreetA = $row['StreetA'];
+						$StreetB = $row['StreetB'];
+						$StreetC = $row['StreetC'];
+						$Town = $row['Town'];
+						$County = $row['County'];
+						$Postcode = $row['Postcode'];
+						$COUNTRY = $row['COUNTRY'];
+		
+		 				$CompanyFullAddress = $StreetA;
+				
+							if (!empty($StreetB)) { $CompanyFullAddress .=  "&lt;br /&gt; ".$StreetB; }
+							if (!empty($StreetC)) { $CompanyFullAddress .=  "&lt;br /&gt; ".$StreetC; }
+							if (!empty($Town)) { $CompanyFullAddress .=  "&lt;br /&gt; ".$Town; }
+							if (!empty($County)) { $CompanyFullAddress .=  "&lt;br /&gt; ".$County; } 
+							if (!empty($Postcode)) { $CompanyFullAddress .=  "&amp;nbsp;&amp;nbsp;&amp;nbsp; ".$Postcode; }			
+							if (!empty($COUNTRY)) { $CompanyFullAddress .=  "&lt;br /&gt; ".$COUNTRY; }										 
+					}					
+					mysql_free_result($tCompany_SQLselect_Query);			
+			}
+			
+			{	//  Get the details of all associated Person records
+				//		and store in array:  personArray  with key &gt;$indx
+				 
+					$indx = 0;
+				
+					$tPerson_SQLselect = "SELECT * ";
+					$tPerson_SQLselect .= "FROM ";
+					$tPerson_SQLselect .= "tPerson ";
+					$tPerson_SQLselect .= "WHERE companyID = '".$companyID."' ";
+					
+					$tPerson_SQLselect_Query = mysql_query($tPerson_SQLselect);	
+					
+					while ($row = mysql_fetch_array($tPerson_SQLselect_Query, MYSQL_ASSOC)) {
+						
+						//		we need this to pass to personEdit.php
+						$personArray[$indx]['ID'] = $row['ID'];
+						//^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+						
+						$personArray[$indx]['Salutation'] = $row['Salutation'];
+						$personArray[$indx]['FirstName'] = $row['FirstName'];
+						$personArray[$indx]['LastName'] = $row['LastName'];
+						$personArray[$indx]['Tel'] = $row['Tel'];
+						$personArray[$indx]['eMail'] = $row['eMail'];
+							
+						$indx++;			 
+					}
+		
+					$numPersons = sizeof($personArray);
+							
+					mysql_free_result($tPerson_SQLselect_Query);			
+			}
+		
+			{	//		Output 
+
+					$tdOdd = 'style = "background-color: #FF8F8F;"';
+					$tdEven = 'style = "background-color: #76E9FF;"';
+					
+					echo '&lt;div style=" font-family: arial, helvetica, sans-serif; "&gt;';
+		
+							{	//		Table to render tCompany detail	
+							echo 	  '&lt;table&gt;
+											&lt;tr valign="top"&gt;								
+												&lt;td style=" font-size: 24; 
+																font-weight: bold;" 
+																&gt;
+														'.$fullCoyName.'
+												&lt;/td&gt;
+												
+												&lt;td align="right" width="400"&gt;
+														'.$CompanyFullAddress.'			
+												&lt;/td&gt;
+											&lt;/tr&gt;
+										&lt;/table&gt;';
+							//		END: Table to render tCompany detail
+							}
+															
+							echo '&lt;div style="margin-left: 100; "&gt;';
+				
+							{	//		Table of tPerson records
+							echo '&lt;table border="1" padding="5"&gt;';
+								echo '&lt;tr&gt;
+											&lt;td&gt;Salutation&lt;/td&gt;
+											&lt;td&gt;FirstName&lt;/td&gt;
+											&lt;td&gt;LastName&lt;/td&gt;
+											&lt;td&gt;Telephone&lt;/td&gt;
+											&lt;td&gt;eMail&lt;/td&gt;
+											&lt;td&gt;&amp;nbsp;&lt;/td&gt;
+										&lt;/tr&gt;	';	
+																		
+								for ($indx = 0; $indx &lt; $numPersons; $indx++) {
+									$thisID = $personArray[$indx]['ID'];
+									$personEditLink = '&lt;a href="personEditForm.php?personID='.$thisID.'"&gt;Edit&lt;/a&gt;';
+									
+		        					if (($indx % 2) == 1) {$rowClass = $tdOdd; } else { $rowClass = $tdEven; }  
+		 
+									echo '&lt;tr '.$rowClass.' height="20"&gt;
+									
+												&lt;td&gt;'.$personArray[$indx]['Salutation'].'&amp;nbsp;&lt;/td&gt;
+												
+												&lt;td&gt;'.$personArray[$indx]['FirstName'].'&amp;nbsp;&lt;/td&gt;
+		
+												&lt;td&gt;'.$personArray[$indx]['LastName'].'&amp;nbsp;&lt;/td&gt;
+		
+												&lt;td&gt;'.$personArray[$indx]['Tel'].'&amp;nbsp;&lt;/td&gt;
+												
+												&lt;td&gt;'.$personArray[$indx]['eMail'].'&amp;nbsp;&lt;/td&gt;
+												
+												&lt;td&gt;'.$personEditLink.'&amp;nbsp;&lt;/td&gt;
+												
+											&lt;/tr&gt;	';			     
+								}
+							echo '&lt;/table&gt;';
+							//		END:  Table of tPerson records
+							}	
+																				
+							{	//		FORM to INSERT person		
+
+								{	//		Create the personAdd form fields
+								//$fld_Salutation = '&lt;input type="text" name="Salutation" size="5" maxlength="10"/&gt;';
+								$fld_FirstName = '&lt;input type="text" name="FirstName"  size="10" maxlength="50"/&gt;';
+								$fld_LastName = '&lt;input type="text" name="LastName"  size="10" maxlength="50"/&gt;';
+								$fld_Tel = '&lt;input type="text" name="Tel"  size="10" maxlength="50"/&gt;';			
+								$fld_eMail = '&lt;input type="text" name="eMail"  size="10" maxlength="50"/&gt;';			
+								//		END: Create the personAdd form fields
+								}	
+								
+								{	//	create the Salutation DROPDOWN  FIELD 
+									$salut_SQL =  "SELECT lookupValue FROM tLookup ";
+									$salut_SQL .= "WHERE lookupType = 'Salutation' ";
+									$salut_SQL .= "ORDER By lookupOrder ";
+									
+									$salut_SQL_Query = mysql_query($salut_SQL);	
+						
+									$fld_Salutation = '&lt;select name="Salutation"&gt;';
+										//$fld_Salutation .= '&lt;option selected="selected"&gt;&lt;/option&gt;';
+							 	
+										while ($row = mysql_fetch_array($salut_SQL_Query, MYSQL_ASSOC)) {
+										    $salutValue = $row['lookupValue'];
+										    if ($current_Salutation == $salutValue) { 
+										    	$selectedFlag = " selected";
+										    } else { 
+										    	$selectedFlag = "";
+										    }
+										    $fld_Salutation .= '&lt;option'.$selectedFlag.'&gt;'.$salutValue.'&lt;/option&gt;';
+										}
+									
+										mysql_free_result($salut_SQL_Query);		
+							
+									$fld_Salutation .= '&lt;/select&gt;';
+									
+								//	END: create the Salutation DROPDOWN  FIELD 
+								}	
+
+							echo '&lt;form action="personInsert.php" method="post"&gt;';
+								echo '&lt;input type="hidden" name="companyID" value="'.$companyID.'" /&gt;';
+								
+								echo '&lt;table&gt;';		
+										echo '&lt;tr&gt;
+												&lt;td colspan="6"&gt;&lt;/td&gt;
+											&lt;/tr&gt;	';	
+										echo '&lt;tr&gt;
+												&lt;td colspan="6"&gt;&lt;hr /&gt;&lt;/td&gt;
+											&lt;/tr&gt;	';	
+										echo '&lt;tr&gt;
+												&lt;td colspan="6"&gt;&lt;/td&gt;
+											&lt;/tr&gt;	';	
+										echo '&lt;tr&gt;
+												&lt;td&gt;Salutation&lt;/td&gt;
+												&lt;td&gt;FirstName&lt;/td&gt;
+												&lt;td&gt;LastName&lt;/td&gt;
+												&lt;td&gt;Telelphone&lt;/td&gt;
+												&lt;td&gt;eMail&lt;/td&gt;
+												&lt;td&gt;&amp;nbsp;&lt;/td&gt;
+											&lt;/tr&gt;	';												
+										echo '&lt;tr&gt;
+												&lt;td&gt;'.$fld_Salutation.'&lt;/td&gt;
+												&lt;td&gt;'.$fld_FirstName.'&lt;/td&gt;
+												&lt;td&gt;'.$fld_LastName.'&lt;/td&gt;
+												&lt;td&gt;'.$fld_Tel.'&lt;/td&gt;
+												&lt;td&gt;'.$fld_eMail.'&lt;/td&gt;
+												&lt;td&gt;&lt;input type="submit" value="Add" /&gt;&lt;/td&gt;
+											&lt;/tr&gt;	';	
+								echo '&lt;/table&gt;';
+							echo '&lt;/form&gt;';
+							//		END: FORM to INSERT person		
+							}
+																								
+							echo '&lt;/div&gt;';		//		END:  &lt;div style="margin-left: 100; "&gt;
+							
+					echo '&lt;/div&gt;';				//		END:	&lt;div style=" font-family..."&gt;
+		
+			//		END: Output section 
+			}
+				
+		} else {
+
+			{	//	Select company from dropdowm
+				
+				$tCompany_SQLselect = "SELECT  ";
+				$tCompany_SQLselect .= "ID, preName, Name ";	
+				$tCompany_SQLselect .= "FROM ";
+				$tCompany_SQLselect .= "tCompany ";
+				$tCompany_SQLselect .= "Order By Name ";
+					
+				$tCompany_SQLselect_Query = mysql_query($tCompany_SQLselect);	
+				
+				echo '&lt;form action="'.$thisScriptName.'" method="post"&gt;';
+				
+				echo '&lt;select name="companyID"&gt;';
+				
+					echo '&lt;option value="0" label="coyvalue" selected="selected"&gt;..select company..&lt;/option&gt;';
+			 	
+						while ($row = mysql_fetch_array($tCompany_SQLselect_Query, MYSQL_ASSOC)) {
+						    $ID = $row['ID'];
+						    $preName = $row['preName'];
+						    $companyName = $row['Name'];
+						    $RegType = $row['RegType'];
+						    
+						    $fullCoyName = trim($preName." ".$companyName." ".$RegType);
+						    
+						    echo '&lt;option value="'.$ID.'"&gt;'.$fullCoyName.'&lt;/option&gt;';
+						}
+					
+						mysql_free_result($tCompany_SQLselect_Query);		
+				
+						echo '&lt;/select&gt;';
+				
+						echo '&lt;input type="submit" /&gt;';
+						
+				echo '&lt;/form&gt;';
+				//	END:  Select company from dropdowm
+			}
+			
+		}
+		
+//		END:	if ($dbSuccess)
+}
+
+echo "&lt;br /&gt;&lt;hr /&gt;&lt;br /&gt;";
+
+unset($companyID);
+
+echo '&lt;a href="companyListOrder.php"&gt;Company List&lt;/a&gt;';
+echo '&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;';
+echo '&lt;a href="'.$thisScriptName.'"&gt;Select Another&lt;/a&gt;';
+echo '&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;';
+echo '&lt;a href="../index.php"&gt;Quit - to homepage&lt;/a&gt;';
+
+?&gt;</before><after/></leaf><leaf type="insert" title="Ex_06_1_personEditForm"><before>&lt;?php
+/*
+
+*	File:			personEditForm.php
+*	By:			TMIT
+*	Date:		2010-06-01
+*
+*	This script defines an HTML form to load person details
+*	and POST changed fields back to this form and UPDATE
+*	If UPDATE is good then use header(Location: ...
+*	to return to the companyPeopleEdit form
+*
+*
+*=====================================
+*/
+
+{ 		//	Secure Connection Script
+		include('../../htconfig/dbConfig.php'); 
+		$dbSuccess = false;
+		$dbConnected = mysql_connect($db['hostname'],$db['username'],$db['password']);
+		
+		if ($dbConnected) {		
+			$dbSelected = mysql_select_db($db['database'],$dbConnected);
+			if ($dbSelected) {
+				$dbSuccess = true;
+			} else {
+				echo "DB Selection FAILed";
+			}
+		} else {
+				echo "MySQL Connection FAILed";
+		}
+		//	END	Secure Connection Script
+}
+
+$thisScriptName = "personEditForm.php";
+
+if ($dbSuccess) {
+
+	$saveClicked = $_POST["saveClicked"];
+	
+	{	//	SAVE button was clicked 
+		if (isset($saveClicked)) {
+			unset($saveClicked);
+			
+			$companyID = $_POST["companyID"];	
+			
+			$personID = $_POST["personID"];	
+			$Salutation = $_POST["Salutation"];	
+			$FirstName = $_POST["FirstName"];	
+			$LastName = $_POST["LastName"];	
+			$Telephone = $_POST["Telephone"];	
+			$eMail = $_POST["eMail"];	
+	
+			$tPerson_SQLupdate = "UPDATE tPerson SET ";			
+			$tPerson_SQLupdate .=  "CompanyID = '".$companyID."', "; 
+			
+			$tPerson_SQLupdate .=  "Salutation = '".$Salutation."', ";
+			$tPerson_SQLupdate .=  "FirstName = '".$FirstName."', ";
+			$tPerson_SQLupdate .=  "LastName = '".$LastName."', ";
+			$tPerson_SQLupdate .=  "Tel = '".$Telephone."', ";
+			$tPerson_SQLupdate .=  "eMail = '".$eMail."' ";
+			$tPerson_SQLupdate .=  "WHERE ID = '".$personID."' "; 	
+	
+			if (mysql_query($tPerson_SQLupdate))  {	
+				echo header("Location: companyPeopleEdit.php?companyID=".$companyID);
+			} else {
+				echo '&lt;span style="color:red; "&gt;FAILED to update the company.&lt;/span&gt;&lt;br /&gt;&lt;br /&gt;';
+				
+			}				
+		}	
+	//	END:  SAVE button was clicked 	ie. if (isset($saveClicked))
+	}		
+	
+	{	//  Get the details of the company selected 
+			$personID = $_GET["personID"];	
+					
+			$tPerson_SQLselect = "SELECT * ";
+			$tPerson_SQLselect .= "FROM ";
+			$tPerson_SQLselect .= "tPerson ";
+			$tPerson_SQLselect .= "WHERE ID = '".$personID."' ";
+			
+			$tPerson_SQLselect_Query = mysql_query($tPerson_SQLselect);	
+			
+			while ($row = mysql_fetch_array($tPerson_SQLselect_Query, MYSQL_ASSOC)) {
+				$current_Salutation = $row['Salutation'];
+				$current_FirstName = $row['FirstName'];
+				$current_LastName = $row['LastName'];
+				$current_Tel = $row['Tel'];
+				$current_eMail = $row['eMail'];
+				
+				$companyID = $row['CompanyID'];
+				 
+			}
+			
+			mysql_free_result($tPerson_SQLselect_Query);			
+	//  END: Get the details of the company selected 
+	}
+
+	echo '&lt;h2 style="font-family: arial, helvetica, sans-serif;" &gt;
+				Person EDIT Form
+			&lt;/h2&gt;';
+	
+	{	//		FORM postPerson 
+	
+		$fld_personID = '&lt;input type="hidden" name="personID" value="'.$personID.'"/&gt;';
+		$fld_saveClicked = '&lt;input type="hidden" name="saveClicked" value="1"/&gt;';
+
+		$fld_FirstName = '&lt;input type="text" name="FirstName" value="'.$current_FirstName.'"/&gt;';
+		$fld_LastName = '&lt;input type="text" name="LastName" value="'.$current_LastName.'"/&gt;';
+		$fld_Tel = '&lt;input type="text" name="Telephone" value="'.$current_Tel.'"/&gt;';
+		$fld_eMail = '&lt;input type="text" name="eMail" value="'.$current_eMail.'"/&gt;';
+
+
+		{	//	create the Company DROPDOWN  FIELD 
+			$companyList_SQL =  "SELECT ID, prename, Name, RegType FROM tCompany ";
+			$companyList_SQL .= "ORDER By Name ";
+			
+			$companyList_SQL_Query = mysql_query($companyList_SQL);	
+
+			$fld_companyID = '&lt;select name="companyID"&gt;';
+	 	
+				while ($row = mysql_fetch_array($companyList_SQL_Query, MYSQL_ASSOC)) {
+				    $dd_companyID = $row['ID'];
+				    $dd_preName = $row['preName'];
+				    $dd_companyName = $row['Name'];
+				    $dd_RegType = $row['RegType'];
+				    
+				    $fullCoyName = trim($dd_preName." ".$dd_companyName." ".$dd_RegType);
+				    
+				    if ($dd_companyID == $companyID) { 
+				    	$selectedFlag = " selected";
+				    } else { 
+				    	$selectedFlag = "";
+				    }
+				    $fld_companyID .= '&lt;option value="'.$dd_companyID.'"';
+				    $fld_companyID .= $selectedFlag.'&gt;'.$fullCoyName.'&lt;/option&gt;';
+				}
+			
+				mysql_free_result($companyList_SQL_Query);		
+	
+			$fld_companyID .= '&lt;/select&gt;';
+			
+		//	END: create the Company DROPDOWN  FIELD 
+		}	
+
+		{	//	create the Selection DROPDOWN  FIELD 
+			$salut_SQL =  "SELECT lookupValue FROM tLookup ";
+			$salut_SQL .= "WHERE lookupType = 'Salutation' ";
+			$salut_SQL .= "ORDER By lookupOrder ";
+			
+			$salut_SQL_Query = mysql_query($salut_SQL);	
+
+			$fld_Salutation = '&lt;select name="Salutation"&gt;';
+	 	
+				while ($row = mysql_fetch_array($salut_SQL_Query, MYSQL_ASSOC)) {
+				    $salutValue = $row['lookupValue'];
+				    if ($current_Salutation == $salutValue) { 
+				    	$selectedFlag = " selected";
+				    } else { 
+				    	$selectedFlag = "";
+				    }
+				    $fld_Salutation .= '&lt;option'.$selectedFlag.'&gt;'.$salutValue.'&lt;/option&gt;';
+				}
+			
+				mysql_free_result($tCompany_SQLselect_Query);		
+	
+			$fld_Salutation .= '&lt;/select&gt;';
+			
+		//	END: create the Selection DROPDOWN  FIELD 
+		}	
+
+
+		echo '&lt;form name="postPerson" action="'.$thisScriptName.'" method="post"&gt;';
+		
+				echo $fld_personID;
+				//echo $fld_companyID;
+				echo $fld_saveClicked;
+				echo '
+				&lt;table&gt;
+					&lt;tr&gt;
+						&lt;td&gt;Salutation&lt;/td&gt;
+						&lt;td&gt;'.$fld_Salutation.'&lt;/td&gt;
+					&lt;/tr&gt;
+					&lt;tr&gt;
+						&lt;td&gt;First Name&lt;/td&gt;
+						&lt;td&gt;'.$fld_FirstName.'&lt;/td&gt;
+					&lt;/tr&gt;
+					&lt;tr&gt;
+						&lt;td&gt;Last Name&lt;/td&gt;
+						&lt;td&gt;'.$fld_LastName.'&lt;/td&gt;
+					&lt;/tr&gt;
+					&lt;tr&gt;
+						&lt;td&gt;Telephone&lt;/td&gt;
+						&lt;td&gt;'.$fld_Tel.'&lt;/td&gt;
+					&lt;/tr&gt;
+					&lt;tr&gt;&#xD;
+					&lt;tr&gt;
+						&lt;td&gt;eMail&lt;/td&gt;
+						&lt;td&gt;'.$fld_eMail.'&lt;/td&gt;
+					&lt;/tr&gt;
+					&lt;tr&gt;&#xD;
+					&lt;td&gt;Company&lt;/td&gt;&#xD;
+						&lt;td&gt;'.$fld_companyID.'&lt;/td&gt;&#xD;
+					&lt;/tr&gt;&#xD;					&lt;tr&gt;
+						&lt;td&gt;&amp;nbsp;&lt;/td&gt;
+						&lt;td align="right"&gt;&lt;input type="submit"  value="Save" /&gt;&lt;/td&gt;
+					&lt;/tr&gt;					
+				&lt;/table&gt;
+				';
+					
+		echo '&lt;/form&gt;';
+		
+
+	//	END:	FORM postPerson 
+	}
+	
+	echo "&lt;br /&gt;&lt;hr /&gt;&lt;br /&gt;";
+	
+	echo '&lt;a href="companyPeopleEdit.php?companyID='.$companyID.'"&gt;Return to Company/People List&lt;/a&gt;';
+	echo "&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;";
+	echo '&lt;a href="../index.php"&gt;Quit - to homepage&lt;/a&gt;';
+
+}
+
+?&gt;</before><after/></leaf><leaf type="insert" title="Ex_06_2_companyCreate"><before>&lt;?php
+/*
+
+*	File:			companyCreate.php
+*	By:			TMIT
+*	Date:		2010-06-01
+*
+*	This script defines an HTML form using php 
+*	for user to enter company details - POST to companySave.php
+*
+*
+*=====================================
+*/
+
+{ 		//	Secure Connection Script
+		include('../../htconfig/dbConfig.php'); 
+		$dbSuccess = false;
+		$dbConnected = mysql_connect($db['hostname'],$db['username'],$db['password']);
+		
+		if ($dbConnected) {		
+			$dbSelected = mysql_select_db($db['database'],$dbConnected);
+			if ($dbSelected) {
+				$dbSuccess = true;
+			} else {
+				echo "DB Selection FAILed";
+			}
+		} else {
+				echo "MySQL Connection FAILed";
+		}
+		//	END	Secure Connection Script
+}
+
+if ($dbSuccess) {
+
+	echo '&lt;h2 style="font-family: arial, helvetica, sans-serif;" &gt;
+				New Company Creation Form
+			&lt;/h2&gt;';
+
+	echo "&lt;br /&gt;";
+	
+							
+		{	//	create the COUNTRY DROPDOWN  FIELD 
+			$COUNTRY_SQL =  "SELECT lookupValue FROM tLookup ";
+			$COUNTRY_SQL .= "WHERE lookupType = 'country' ";
+			$COUNTRY_SQL .= "ORDER By lookupOrder ";
+			
+			$COUNTRY_SQL_Query = mysql_query($COUNTRY_SQL);	
+
+			$fld_COUNTRY = '&lt;select name="COUNTRY"&gt;';		 
+			$fld_COUNTRY .= '&lt;option&gt;&lt;/option&gt;';	
+				while ($row = mysql_fetch_array($COUNTRY_SQL_Query, MYSQL_ASSOC)) {
+				    $COUNTRYValue = $row['lookupValue'];
+				    $fld_COUNTRY .= '&lt;option&gt;'.$COUNTRYValue.'&lt;/option&gt;';
+				}			
+				mysql_free_result($COUNTRY_SQL_Query);			
+			$fld_COUNTRY .= '&lt;/select&gt;';				
+		//	END: create the COUNTRY DROPDOWN  FIELD 
+		}	
+
+		{	//	FORM postCompany 
+		echo '&lt;form name="postCompany" action="companySave.php" method="post"&gt;';
+		
+				echo '
+				&lt;table&gt;
+					&lt;tr&gt;
+						&lt;td&gt;pre Name&lt;/td&gt;
+						&lt;td&gt;&lt;input type="text" name="preName" /&gt;&lt;/td&gt;
+					&lt;/tr&gt;
+					&lt;tr&gt;
+						&lt;td&gt;Company Name&lt;/td&gt;
+						&lt;td&gt;&lt;input type="text" name="companyName" /&gt;&lt;/td&gt;
+					&lt;/tr&gt;
+					&lt;tr&gt;
+						&lt;td&gt;Reg Type&lt;/td&gt;
+						&lt;td&gt;&lt;input type="text" name="RegType" /&gt;&lt;/td&gt;
+					&lt;/tr&gt;
+					&lt;tr&gt;
+						&lt;td&gt;Address&lt;/td&gt;
+						&lt;td&gt;&lt;input type="text" name="StreetA" /&gt;&lt;/td&gt;
+					&lt;/tr&gt;
+					&lt;tr&gt;
+						&lt;td&gt;&lt;/td&gt;
+						&lt;td&gt;&lt;input type="text" name="StreetB" /&gt;&lt;/td&gt;
+					&lt;/tr&gt;
+					&lt;tr&gt;
+						&lt;td&gt;&lt;/td&gt;
+						&lt;td&gt;&lt;input type="text" name="StreetC" /&gt;&lt;/td&gt;
+					&lt;/tr&gt;
+					&lt;tr&gt;
+						&lt;td&gt;Town&lt;/td&gt;
+						&lt;td&gt;&lt;input type="text" name="Town" /&gt;&lt;/td&gt;
+					&lt;/tr&gt;
+					&lt;tr&gt;
+						&lt;td&gt;County&lt;/td&gt;
+						&lt;td&gt;&lt;input type="text" name="County" /&gt;&lt;/td&gt;
+					&lt;/tr&gt;
+					&lt;tr&gt;
+						&lt;td&gt;Postcode&lt;/td&gt;
+						&lt;td&gt;&lt;input type="text" name="Postcode" /&gt;&lt;/td&gt;
+					&lt;/tr&gt;
+					&lt;tr&gt;
+						&lt;td&gt;COUNTRY&lt;/td&gt;
+						&lt;td&gt;'.$fld_COUNTRY.'&lt;/td&gt;
+					&lt;/tr&gt;
+					&lt;tr&gt;
+						&lt;td&gt;&lt;/td&gt;
+						&lt;td align="right"&gt;&lt;input type="submit"  value="Save" /&gt;&lt;/td&gt;
+					&lt;/tr&gt;
+				&lt;/table&gt;
+				';
+					
+		echo '&lt;/form&gt;';
+		//	END: FORM postCompany 
+		}		
+		
+	
+	echo "&lt;br /&gt;&lt;hr /&gt;&lt;br /&gt;";
+
+
+	echo '&lt;a href="../index.php"&gt;Quit - to homepage&lt;/a&gt;';
+
+}
+
+?&gt;</before><after/></leaf></branch></branch><leaf type="insert" title="New php Script File"><before>&lt;?php
+/*
+
+*	File:			%1
+*	By:			TMIT
+*	Date:		%0
+*
+*	This script </before><after>
+*
+*
+*=====================================
+*/
+
+{ 		//	Secure Connection Script
+		include('../htconfig/dbConfig.php'); 
+		$dbSuccess = false;
+		$dbConnected = mysql_connect($db['hostname'],$db['username'],$db['password']);
+		
+		if ($dbConnected) {		
+			$dbSelected = mysql_select_db($db['database'],$dbConnected);
+			if ($dbSelected) {
+				$dbSuccess = true;
+			} 	
+		}
+		//	END	Secure Connection Script
+}
+
+if ($dbSuccess) {
+	
+	
+	
+}
+
+?&gt;</after><param name="date"/><param name="file name"/></leaf></branch>
+</snippets>

@@ -1,0 +1,26 @@
+<?php
+	
+
+	//		File:    foreach_demo.php		
+		
+	echo 'The foreach loop is used with ARRAYs<br /><br />';	
+	
+	$arr = array(
+	                         'Surrey' => 'England',
+	                         'Victoria' => 'Australia',
+	                         'Ohio' => 'USA',
+	                         'Manitoba' => 'Canada' );
+	
+	foreach ($arr as $indexName => $itemValue)
+	{
+	      echo  "\$arr[$indexName] => $itemValue<br />";
+	}
+
+
+	echo "<br /><hr /><br />";
+
+
+
+
+
+?>
